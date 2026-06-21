@@ -1,0 +1,7 @@
+Embedding models transform textual content into dense numerical vectors that encode semantic meaning. These vectors enable similarity-based retrieval by positioning semantically related text near each other within high-dimensional vector space. Embeddings are fundamental to modern retrieval systems because they support semantic search beyond exact keyword matching.
+
+Most embedding models are based on transformer architectures trained using contrastive learning objectives. During training, semantically related sentence pairs are encouraged to produce nearby vector representations, while unrelated pairs are pushed farther apart in vector space. This training process enables embeddings to capture contextual meaning and conceptual similarity.
+
+Different embedding models exhibit varying strengths depending on training data and optimization objectives. Some models are optimized for general semantic similarity, while others target domain-specific retrieval tasks such as legal search, scientific literature retrieval, or multilingual document matching.
+
+Embedding dimensionality also influences retrieval behavior. Higher-dimensional embeddings may capture richer semantic nuance but require greater computational and storage resources. Production systems often select embedding models based on tradeoffs involving retrieval quality, inference latency, infrastructure cost, and scalability.

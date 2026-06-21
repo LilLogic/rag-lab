@@ -1,0 +1,7 @@
+Kubernetes is a container orchestration platform designed to automate deployment, scaling, networking, and lifecycle management for distributed applications. It abstracts infrastructure complexity by providing declarative resource management across clusters of machines.
+
+Containers package applications together with their dependencies, enabling consistent execution across development, testing, and production environments. Kubernetes schedules these containers onto cluster nodes according to resource availability and operational constraints.
+
+Core Kubernetes primitives include Pods, Deployments, Services, ConfigMaps, StatefulSets, and Ingress resources. These abstractions allow engineers to model scalable distributed applications while delegating operational orchestration to the Kubernetes control plane.
+
+Kubernetes also provides self-healing mechanisms such as automatic restarts, rolling updates, health checks, and autoscaling capabilities. These features make it a dominant platform for modern cloud-native infrastructure and large-scale microservice deployments.

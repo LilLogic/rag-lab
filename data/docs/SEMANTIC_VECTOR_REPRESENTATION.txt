@@ -1,0 +1,7 @@
+Semantic vectors encode language meaning using numerical coordinates distributed across high-dimensional space. Each embedding dimension captures latent semantic relationships learned during model training. Similar concepts tend to occupy nearby regions in vector space even when expressed using different vocabulary.
+
+Unlike traditional keyword search systems, semantic representations allow retrieval engines to identify conceptual relationships between queries and documents. For example, a query about “database scaling” may retrieve content discussing “distributed storage optimization” even when exact terms do not overlap.
+
+Vector representations also support contextual understanding by incorporating surrounding linguistic information into the embedding generation process. This allows embeddings to disambiguate polysemous words depending on sentence context, improving retrieval precision compared to purely lexical search approaches.
+
+The geometry of embedding space plays a central role in semantic retrieval systems. Similarity metrics such as cosine similarity or dot product measure proximity between vectors and determine which documents are considered most relevant to a given query.

@@ -1,0 +1,7 @@
+Message queues enable asynchronous communication between distributed services by decoupling producers from consumers. Instead of requiring immediate synchronous processing, producers publish messages into a queue where downstream systems consume them independently. This architecture improves scalability and resilience under fluctuating workloads.
+
+Queue-based systems absorb traffic spikes by buffering incoming work items. Consumers process messages at their own pace without forcing upstream systems to block or fail under temporary overload conditions. This buffering capability is critical in high-throughput event-driven architectures.
+
+Popular message brokers such as Kafka, RabbitMQ, Pulsar, and SQS provide durability guarantees, retry mechanisms, partitioning strategies, and consumer coordination features. These systems are widely used in data engineering pipelines, streaming systems, and microservice infrastructures.
+
+Designing reliable queue architectures requires careful consideration of delivery semantics, idempotency, ordering guarantees, retry behavior, and dead-letter queue management. Poor queue design can introduce duplication, message loss, or cascading failure scenarios across distributed systems.

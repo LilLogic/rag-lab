@@ -1,0 +1,7 @@
+Distributed systems often replicate data across multiple machines in order to improve scalability, resilience, and availability. However, maintaining consistency between distributed nodes introduces significant engineering complexity. Network partitions, replication lag, and concurrent writes can cause nodes to temporarily diverge from each other.
+
+Strong consistency models guarantee that all clients observe the same data state immediately after a write operation completes. While this simplifies application logic, it may reduce system availability and increase latency because synchronization between nodes becomes mandatory before acknowledging operations.
+
+Eventual consistency relaxes synchronization constraints by allowing temporary divergence between replicas. Over time, replicas converge toward the same state as updates propagate through the system. Many large-scale internet services adopt eventual consistency because it improves scalability and fault tolerance under high traffic conditions.
+
+Consistency tradeoffs are often discussed through the CAP theorem, which states that distributed systems cannot simultaneously maximize consistency, availability, and partition tolerance during network failures. System architects therefore select tradeoffs according to business requirements and operational constraints.

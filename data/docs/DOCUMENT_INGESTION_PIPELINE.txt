@@ -1,0 +1,7 @@
+The ingestion pipeline is responsible for collecting and preparing raw data before it becomes searchable by the retrieval system. Input sources may include PDFs, Word documents, HTML pages, emails, transcripts, database records, wiki pages, spreadsheets, or API outputs. The goal of ingestion is to transform heterogeneous data sources into normalized textual representations suitable for indexing.
+
+Document ingestion often involves extraction tools capable of parsing complex formats and preserving meaningful textual structure. For example, PDF parsing systems attempt to reconstruct paragraphs, tables, and headings while removing layout artifacts that could degrade retrieval quality. OCR systems may also be required when processing scanned or image-based documents.
+
+Large-scale ingestion systems usually operate asynchronously through distributed pipelines. Message queues, workflow orchestrators, and batch processing frameworks are commonly used to manage ingestion at enterprise scale. This architecture enables incremental indexing and continuous synchronization with evolving knowledge repositories.
+
+Metadata extraction is another important component of ingestion pipelines. Information such as source identifiers, timestamps, authorship, document categories, security labels, and business domains may later be used for filtering, ranking, or enforcing access control policies during retrieval operations.

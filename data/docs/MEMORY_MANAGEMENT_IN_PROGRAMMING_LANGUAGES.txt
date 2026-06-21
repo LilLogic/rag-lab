@@ -1,0 +1,7 @@
+Memory management controls how applications allocate, access, and release memory during execution. Efficient memory handling directly impacts performance, stability, and scalability, particularly in long-running backend systems and AI workloads.
+
+Low-level languages such as C and C++ rely heavily on manual memory management. Developers explicitly allocate and free memory using constructs such as malloc and free. While this approach provides fine-grained control, it also increases the risk of memory leaks, dangling pointers, and segmentation faults.
+
+Managed languages such as Java, Go, and Python use garbage collection systems that automatically reclaim unused memory. Garbage collectors simplify development by reducing manual memory handling requirements, although they may introduce runtime overhead and unpredictable pause times.
+
+Modern runtime environments increasingly optimize garbage collection through generational collection, concurrent sweeping, and adaptive allocation strategies. These improvements aim to balance developer productivity with high-performance execution requirements.

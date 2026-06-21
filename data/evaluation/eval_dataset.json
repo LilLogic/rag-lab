@@ -1,0 +1,26 @@
+[
+  {
+    "question": "How does caching improves system performance?",
+    "expected_sources": [
+      "CACHE_INVALIDATION_STRATEGIES.txt"
+    ]
+  },
+  {
+    "question": "What is the advantage of small chunks in retrieval?",
+    "expected_sources": [
+      "CHUNKING_IN_RAG_SYSTEMS.txt"
+    ]
+  },
+  {
+    "question": "What do database indexes do?",
+    "expected_sources": [
+      "DATABASE_INDEXING_STRATEGIES.txt"
+    ]
+  },
+  {
+    "question": "How do distributed systems work?",
+    "expected_sources": [
+      "DISTRIBUTED_SYSTEMS_CONSISTENCY.txt"
+    ]
+  }
+]

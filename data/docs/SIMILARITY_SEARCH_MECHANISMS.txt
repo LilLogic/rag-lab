@@ -1,0 +1,7 @@
+Similarity search identifies vectors that are closest to a query embedding according to mathematical distance metrics. This process forms the foundation of semantic retrieval systems because it enables conceptually related documents to be retrieved even without explicit keyword overlap.
+
+Cosine similarity measures angular proximity between vectors and is widely used in embedding retrieval systems because it emphasizes semantic direction rather than vector magnitude. Euclidean distance and dot product similarity are also commonly applied depending on embedding model characteristics and optimization strategies.
+
+Brute-force similarity search becomes computationally impractical at scale because each query would require comparison against every stored vector. Approximate nearest neighbor algorithms solve this problem by organizing embeddings into efficient search structures capable of rapidly identifying candidate neighbors.
+
+Retrieval quality depends heavily on the interaction between embedding quality, indexing strategy, similarity metrics, and search hyperparameters. Fine-tuning these retrieval components is essential for achieving strong semantic relevance in production-grade RAG systems.

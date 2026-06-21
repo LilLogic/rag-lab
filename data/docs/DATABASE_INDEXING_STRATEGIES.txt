@@ -1,0 +1,7 @@
+Database indexes improve query performance by creating optimized data structures that reduce the amount of scanning required during retrieval operations. Without indexes, databases may need to perform full table scans, which become increasingly inefficient as dataset size grows.
+
+B-tree indexes are among the most common indexing structures used in relational databases. They organize values hierarchically, enabling efficient range queries, sorting operations, and equality lookups. Most SQL databases automatically use B-tree indexes for primary keys and frequently queried columns.
+
+Hash indexes provide fast equality lookups by mapping values to fixed hash buckets. However, they are less effective for range queries because hashed values do not preserve ordering relationships between records. Different index types therefore serve different query patterns.
+
+Although indexes improve read performance, they also introduce overhead during inserts, updates, and deletes because index structures must remain synchronized with underlying table data. Database engineers carefully balance indexing strategies against write amplification and storage costs.

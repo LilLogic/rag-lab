@@ -1,0 +1,7 @@
+Chunking divides documents into smaller semantic units that can be efficiently indexed and retrieved. Since language models and embedding models have token limitations, large documents cannot be processed effectively as single units. Chunking enables scalable retrieval while preserving semantic locality within the indexed content.
+
+Fixed-size chunking splits documents according to predefined token or character limits. This approach is computationally simple and widely used in production systems. However, rigid segmentation may break semantic continuity if important concepts span chunk boundaries.
+
+Semantic chunking attempts to preserve conceptual coherence by segmenting text according to sentence structure, headings, topics, or discourse boundaries. More advanced chunkers may leverage language models to identify natural semantic transitions inside documents. These methods often improve retrieval quality at the cost of higher preprocessing complexity.
+
+Chunk size selection represents a major engineering tradeoff in RAG systems. Small chunks improve retrieval granularity but may lack sufficient contextual information. Large chunks preserve richer context but may reduce retrieval precision and consume excessive context window space during prompt construction.

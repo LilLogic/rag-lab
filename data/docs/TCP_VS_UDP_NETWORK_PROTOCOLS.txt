@@ -1,0 +1,7 @@
+TCP and UDP are foundational transport protocols used throughout modern computer networks. TCP prioritizes reliability and ordered delivery, while UDP prioritizes low latency and minimal overhead. Different application requirements determine which protocol is more appropriate.
+
+TCP establishes a persistent connection between communicating systems through a handshake mechanism. It guarantees packet ordering, retransmits lost packets, and performs congestion control. These features make TCP suitable for web traffic, databases, APIs, and file transfers.
+
+UDP operates without persistent connections or delivery guarantees. Packets are transmitted independently without retransmission or ordering enforcement. This reduces latency and protocol overhead, making UDP attractive for real-time applications such as gaming, video streaming, and voice communication.
+
+Modern distributed systems often combine both protocols depending on workload characteristics. Reliability-sensitive operations typically rely on TCP, while latency-sensitive real-time systems frequently leverage UDP-based communication strategies.

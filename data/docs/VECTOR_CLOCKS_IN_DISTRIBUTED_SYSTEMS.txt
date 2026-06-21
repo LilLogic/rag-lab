@@ -1,0 +1,7 @@
+Vector clocks are mechanisms used to track causality relationships between events in distributed systems. Unlike simple timestamps, vector clocks can determine whether two events are causally related or occurred concurrently across different nodes.
+
+Each node in the system maintains a vector containing counters for all participating nodes. Whenever an event occurs, the local node increments its counter and propagates updated vector information alongside outgoing messages. Receiving nodes merge vectors to maintain causal history.
+
+Vector clocks are particularly useful in eventually consistent systems where updates may arrive out of order due to network latency or partitioning. They help identify conflicting writes and support deterministic conflict resolution strategies.
+
+Although vector clocks provide strong causal tracking capabilities, they become increasingly expensive as system size grows because vector dimensions scale with the number of participating nodes. Large distributed systems often adopt compressed or alternative causal tracking approaches to reduce overhead.

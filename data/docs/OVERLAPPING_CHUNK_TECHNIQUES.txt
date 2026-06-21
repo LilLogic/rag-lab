@@ -1,0 +1,7 @@
+Chunk overlap preserves contextual continuity between adjacent chunks by duplicating portions of text across chunk boundaries. Without overlap, important information located near the edges of a chunk may become fragmented, reducing retrieval effectiveness for queries that depend on surrounding context.
+
+A common strategy involves introducing overlaps ranging from 10 percent to 30 percent of the chunk size. This ensures that concepts spanning multiple paragraphs remain accessible even when retrieval operates on independently indexed chunks. Overlapping is particularly useful for technical documentation and narrative content.
+
+Although overlap improves contextual preservation, it also increases storage requirements and indexing redundancy. Duplicate embeddings consume additional vector database capacity and may introduce repeated content during retrieval. Systems must therefore balance continuity benefits against infrastructure costs.
+
+Advanced chunking systems sometimes apply adaptive overlap strategies based on semantic transitions rather than fixed token counts. These approaches attempt to maximize contextual integrity while minimizing unnecessary duplication across the indexed corpus.
