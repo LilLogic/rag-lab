@@ -84,6 +84,7 @@ Answer
 * [x] MRR metric
 * [x] Precision@K metric
 * [x] Recall@K metric
+* [x] Expand evaluation dataset
 
 ---
 
@@ -122,7 +123,6 @@ Goal:
 
 ### High Priority
 
-* [ ] Expand evaluation dataset
 * [ ] Add retrieval failure analysis
 * [ ] Review retrieved chunks manually
 * [ ] Identify common retrieval mistakes

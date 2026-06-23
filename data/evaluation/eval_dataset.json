@@ -1,26 +1,310 @@
 [
   {
-    "question": "How does caching improves system performance?",
-    "expected_sources": [
-      "CACHE_INVALIDATION_STRATEGIES.txt"
-    ]
+    "question": "What is the purpose of a Retrieval-Augmented Generation system?",
+    "expected_sources": ["RAG_SYSTEM_OVERVIEW.txt"]
   },
   {
-    "question": "What is the advantage of small chunks in retrieval?",
-    "expected_sources": [
-      "CHUNKING_IN_RAG_SYSTEMS.txt"
-    ]
+    "question": "Why does RAG retrieve external information at inference time?",
+    "expected_sources": ["RAG_SYSTEM_OVERVIEW.txt"]
   },
   {
-    "question": "What do database indexes do?",
-    "expected_sources": [
-      "DATABASE_INDEXING_STRATEGIES.txt"
-    ]
+    "question": "What are the main sequential stages in a RAG workflow?",
+    "expected_sources": ["RAG_SYSTEM_OVERVIEW.txt"]
   },
   {
-    "question": "How do distributed systems work?",
-    "expected_sources": [
-      "DISTRIBUTED_SYSTEMS_CONSISTENCY.txt"
-    ]
+    "question": "Why do enterprise AI systems use RAG architectures?",
+    "expected_sources": ["RAG_SYSTEM_OVERVIEW.txt"]
+  },
+  {
+    "question": "How does RAG reduce hallucinations compared with relying only on a pretrained model?",
+    "expected_sources": ["RAG_SYSTEM_OVERVIEW.txt"]
+  },
+  {
+    "question": "What is the role of an ingestion pipeline before retrieval?",
+    "expected_sources": ["DOCUMENT_INGESTION_PIPELINE.txt"]
+  },
+  {
+    "question": "Which types of input sources can be processed by a document ingestion pipeline?",
+    "expected_sources": ["DOCUMENT_INGESTION_PIPELINE.txt"]
+  },
+  {
+    "question": "Why may OCR be required during document ingestion?",
+    "expected_sources": ["DOCUMENT_INGESTION_PIPELINE.txt"]
+  },
+  {
+    "question": "What metadata can be extracted during ingestion for later filtering or access control?",
+    "expected_sources": ["DOCUMENT_INGESTION_PIPELINE.txt"]
+  },
+  {
+    "question": "How do message queues and workflow orchestrators support enterprise-scale ingestion?",
+    "expected_sources": ["DOCUMENT_INGESTION_PIPELINE.txt", "MESSAGE_QUEUE_ARCHITECTURE.txt"]
+  },
+  {
+    "question": "What is chunking in a RAG system?",
+    "expected_sources": ["CHUNKING_IN_RAG_SYSTEMS.txt"]
+  },
+  {
+    "question": "Why can large documents not always be processed as single units?",
+    "expected_sources": ["CHUNKING_IN_RAG_SYSTEMS.txt"]
+  },
+  {
+    "question": "What is the tradeoff between small chunks and large chunks?",
+    "expected_sources": ["CHUNKING_IN_RAG_SYSTEMS.txt"]
+  },
+  {
+    "question": "Why can fixed-size chunking hurt semantic continuity?",
+    "expected_sources": ["CHUNKING_IN_RAG_SYSTEMS.txt"]
+  },
+  {
+    "question": "How does semantic chunking differ from fixed-size chunking?",
+    "expected_sources": ["CHUNKING_IN_RAG_SYSTEMS.txt"]
+  },
+  {
+    "question": "What is chunk overlap used for?",
+    "expected_sources": ["OVERLAPPING_CHUNK_TECHNIQUES.txt"]
+  },
+  {
+    "question": "What percentage range is commonly used for chunk overlap?",
+    "expected_sources": ["OVERLAPPING_CHUNK_TECHNIQUES.txt"]
+  },
+  {
+    "question": "Why does overlap increase vector database storage requirements?",
+    "expected_sources": ["OVERLAPPING_CHUNK_TECHNIQUES.txt"]
+  },
+  {
+    "question": "How can adaptive overlap reduce unnecessary duplication?",
+    "expected_sources": ["OVERLAPPING_CHUNK_TECHNIQUES.txt"]
+  },
+  {
+    "question": "Which documents explain the risk of losing context at chunk boundaries?",
+    "expected_sources": ["CHUNKING_IN_RAG_SYSTEMS.txt", "OVERLAPPING_CHUNK_TECHNIQUES.txt"]
+  },
+  {
+    "question": "What do embedding models produce from text?",
+    "expected_sources": ["EMBEDDING_MODEL_FOUNDATIONS.txt"]
+  },
+  {
+    "question": "Why are embeddings useful for semantic search beyond keyword matching?",
+    "expected_sources": ["EMBEDDING_MODEL_FOUNDATIONS.txt", "SEMANTIC_VECTOR_REPRESENTATION.txt"]
+  },
+  {
+    "question": "What training objective encourages related sentences to have nearby vector representations?",
+    "expected_sources": ["EMBEDDING_MODEL_FOUNDATIONS.txt"]
+  },
+  {
+    "question": "Why might a domain-specific embedding model outperform a general one?",
+    "expected_sources": ["EMBEDDING_MODEL_FOUNDATIONS.txt"]
+  },
+  {
+    "question": "What tradeoffs influence embedding model selection in production systems?",
+    "expected_sources": ["EMBEDDING_MODEL_FOUNDATIONS.txt"]
+  },
+  {
+    "question": "What are semantic vectors?",
+    "expected_sources": ["SEMANTIC_VECTOR_REPRESENTATION.txt"]
+  },
+  {
+    "question": "How can semantic retrieval find related documents without exact term overlap?",
+    "expected_sources": ["SEMANTIC_VECTOR_REPRESENTATION.txt", "SIMILARITY_SEARCH_MECHANISMS.txt"]
+  },
+  {
+    "question": "Which similarity metrics are used to compare embeddings?",
+    "expected_sources": ["SEMANTIC_VECTOR_REPRESENTATION.txt", "SIMILARITY_SEARCH_MECHANISMS.txt"]
+  },
+  {
+    "question": "What does the geometry of embedding space determine in retrieval?",
+    "expected_sources": ["SEMANTIC_VECTOR_REPRESENTATION.txt"]
+  },
+  {
+    "question": "What is similarity search?",
+    "expected_sources": ["SIMILARITY_SEARCH_MECHANISMS.txt"]
+  },
+  {
+    "question": "Why is brute-force similarity search impractical at scale?",
+    "expected_sources": ["SIMILARITY_SEARCH_MECHANISMS.txt", "VECTOR_DATABASE_ARCHITECTURE.txt"]
+  },
+  {
+    "question": "What do approximate nearest neighbor algorithms optimize for?",
+    "expected_sources": ["SIMILARITY_SEARCH_MECHANISMS.txt", "VECTOR_DATABASE_ARCHITECTURE.txt"]
+  },
+  {
+    "question": "Which retrieval components influence semantic relevance quality?",
+    "expected_sources": ["SIMILARITY_SEARCH_MECHANISMS.txt"]
+  },
+  {
+    "question": "What are vector databases optimized for?",
+    "expected_sources": ["VECTOR_DATABASE_ARCHITECTURE.txt"]
+  },
+  {
+    "question": "Which ANN algorithms are mentioned as vector indexing techniques?",
+    "expected_sources": ["VECTOR_DATABASE_ARCHITECTURE.txt"]
+  },
+  {
+    "question": "What enterprise features can modern vector databases include?",
+    "expected_sources": ["VECTOR_DATABASE_ARCHITECTURE.txt"]
+  },
+  {
+    "question": "How do vector databases fit into broader AI infrastructure?",
+    "expected_sources": ["VECTOR_DATABASE_ARCHITECTURE.txt"]
+  },
+  {
+    "question": "Which documents discuss indexing structures for faster retrieval?",
+    "expected_sources": ["DATABASE_INDEXING_STRATEGIES.txt", "VECTOR_DATABASE_ARCHITECTURE.txt", "SIMILARITY_SEARCH_MECHANISMS.txt"]
+  },
+  {
+    "question": "Why do database indexes improve query performance?",
+    "expected_sources": ["DATABASE_INDEXING_STRATEGIES.txt"]
+  },
+  {
+    "question": "What are B-tree indexes useful for?",
+    "expected_sources": ["DATABASE_INDEXING_STRATEGIES.txt"]
+  },
+  {
+    "question": "Why are hash indexes less effective for range queries?",
+    "expected_sources": ["DATABASE_INDEXING_STRATEGIES.txt"]
+  },
+  {
+    "question": "What write-side costs do indexes introduce?",
+    "expected_sources": ["DATABASE_INDEXING_STRATEGIES.txt"]
+  },
+  {
+    "question": "What is cache invalidation?",
+    "expected_sources": ["CACHE_INVALIDATION_STRATEGIES.txt"]
+  },
+  {
+    "question": "How does time-based cache expiration work?",
+    "expected_sources": ["CACHE_INVALIDATION_STRATEGIES.txt"]
+  },
+  {
+    "question": "Why can write-through caching increase latency?",
+    "expected_sources": ["CACHE_INVALIDATION_STRATEGIES.txt"]
+  },
+  {
+    "question": "What is event-driven cache invalidation?",
+    "expected_sources": ["CACHE_INVALIDATION_STRATEGIES.txt"]
+  },
+  {
+    "question": "What causes nodes in distributed systems to temporarily diverge?",
+    "expected_sources": ["DISTRIBUTED_SYSTEMS_CONSISTENCY.txt"]
+  },
+  {
+    "question": "What is the difference between strong consistency and eventual consistency?",
+    "expected_sources": ["DISTRIBUTED_SYSTEMS_CONSISTENCY.txt"]
+  },
+  {
+    "question": "Why do large-scale internet services often adopt eventual consistency?",
+    "expected_sources": ["DISTRIBUTED_SYSTEMS_CONSISTENCY.txt"]
+  },
+  {
+    "question": "What does the CAP theorem say about distributed systems?",
+    "expected_sources": ["DISTRIBUTED_SYSTEMS_CONSISTENCY.txt"]
+  },
+  {
+    "question": "What are vector clocks used for?",
+    "expected_sources": ["VECTOR_CLOCKS_IN_DISTRIBUTED_SYSTEMS.txt"]
+  },
+  {
+    "question": "How do vector clocks differ from simple timestamps?",
+    "expected_sources": ["VECTOR_CLOCKS_IN_DISTRIBUTED_SYSTEMS.txt"]
+  },
+  {
+    "question": "Why are vector clocks useful in eventually consistent systems?",
+    "expected_sources": ["VECTOR_CLOCKS_IN_DISTRIBUTED_SYSTEMS.txt", "DISTRIBUTED_SYSTEMS_CONSISTENCY.txt"]
+  },
+  {
+    "question": "What scalability problem do vector clocks have?",
+    "expected_sources": ["VECTOR_CLOCKS_IN_DISTRIBUTED_SYSTEMS.txt"]
+  },
+  {
+    "question": "What problem do queues solve between producers and consumers?",
+    "expected_sources": ["MESSAGE_QUEUE_ARCHITECTURE.txt"]
+  },
+  {
+    "question": "How do message queues help systems absorb traffic spikes?",
+    "expected_sources": ["MESSAGE_QUEUE_ARCHITECTURE.txt"]
+  },
+  {
+    "question": "Which message brokers are mentioned?",
+    "expected_sources": ["MESSAGE_QUEUE_ARCHITECTURE.txt"]
+  },
+  {
+    "question": "What queue design issues can cause duplication or message loss?",
+    "expected_sources": ["MESSAGE_QUEUE_ARCHITECTURE.txt"]
+  },
+  {
+    "question": "What is Kubernetes used for?",
+    "expected_sources": ["KUBERNETES_CONTAINER_ORCHESTRATION.txt"]
+  },
+  {
+    "question": "Which Kubernetes primitives are mentioned?",
+    "expected_sources": ["KUBERNETES_CONTAINER_ORCHESTRATION.txt"]
+  },
+  {
+    "question": "How does Kubernetes provide self-healing?",
+    "expected_sources": ["KUBERNETES_CONTAINER_ORCHESTRATION.txt"]
+  },
+  {
+    "question": "What is the main difference between TCP and UDP?",
+    "expected_sources": ["TCP_VS_UDP_NETWORK_PROTOCOLS.txt"]
+  },
+  {
+    "question": "Why is TCP suitable for APIs, databases, and file transfers?",
+    "expected_sources": ["TCP_VS_UDP_NETWORK_PROTOCOLS.txt"]
+  },
+  {
+    "question": "Why is UDP attractive for gaming, video streaming, and voice communication?",
+    "expected_sources": ["TCP_VS_UDP_NETWORK_PROTOCOLS.txt"]
+  },
+  {
+    "question": "What does text preprocessing remove from raw text?",
+    "expected_sources": ["TEXT_PREPROCESSING_STRATEGIES.txt"]
+  },
+  {
+    "question": "Which normalization operations are commonly applied before embedding generation?",
+    "expected_sources": ["TEXT_PREPROCESSING_STRATEGIES.txt"]
+  },
+  {
+    "question": "How can poor preprocessing degrade retrieval quality?",
+    "expected_sources": ["TEXT_PREPROCESSING_STRATEGIES.txt"]
+  },
+  {
+    "question": "Which documents describe preparation steps before embeddings are generated?",
+    "expected_sources": ["DOCUMENT_INGESTION_PIPELINE.txt", "TEXT_PREPROCESSING_STRATEGIES.txt", "CHUNKING_IN_RAG_SYSTEMS.txt"]
+  },
+  {
+    "question": "Why are GPUs important for deep learning workloads?",
+    "expected_sources": ["GPU_ACCELERATION_FOR_AI_WORKLOADS.txt"]
+  },
+  {
+    "question": "Which AI operations benefit from GPU parallelism?",
+    "expected_sources": ["GPU_ACCELERATION_FOR_AI_WORKLOADS.txt"]
+  },
+  {
+    "question": "What are NVLink and InfiniBand used for in AI infrastructure?",
+    "expected_sources": ["GPU_ACCELERATION_FOR_AI_WORKLOADS.txt"]
+  },
+  {
+    "question": "What is memory management responsible for during application execution?",
+    "expected_sources": ["MEMORY_MANAGEMENT_IN_PROGRAMMING_LANGUAGES.txt"]
+  },
+  {
+    "question": "What risks come with manual memory management?",
+    "expected_sources": ["MEMORY_MANAGEMENT_IN_PROGRAMMING_LANGUAGES.txt"]
+  },
+  {
+    "question": "How does garbage collection simplify development?",
+    "expected_sources": ["MEMORY_MANAGEMENT_IN_PROGRAMMING_LANGUAGES.txt"]
+  },
+  {
+    "question": "What scheduling mechanism creates the illusion of concurrent execution on a single-core processor?",
+    "expected_sources": ["OPERATING_SYSTEM_PROCESS_SCHEDULING.txt"]
+  },
+  {
+    "question": "Which objectives can operating system scheduling strategies optimize?",
+    "expected_sources": ["OPERATING_SYSTEM_PROCESS_SCHEDULING.txt"]
+  },
+  {
+    "question": "What factors do modern operating systems consider when scheduling workloads?",
+    "expected_sources": ["OPERATING_SYSTEM_PROCESS_SCHEDULING.txt"]
   }
 ]
