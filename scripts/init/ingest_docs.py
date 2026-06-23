@@ -2,7 +2,7 @@
 Document ingestion pipeline.
 
 This script:
-1. Loads text documents from the docs directory.
+1. Loads text documents from the raw_docs directory.
 2. Splits documents into chunks.
 3. Generates embeddings for each chunk.
 4. Stores chunks and embeddings in PostgreSQL/pgvector.
@@ -16,7 +16,7 @@ from src.client.postgres_client import get_connection
 
 from src.utils.paths import ROOT_DIR
 
-DOCS_DIR = ROOT_DIR / "data/docs"
+DOCS_DIR = ROOT_DIR / "data/raw_docs"
 CHUNK_SIZE = 400
 CHUNK_OVERLAP = 80
 

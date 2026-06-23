@@ -52,28 +52,16 @@ LLM Response
 ```text
 rag_lab/
 │
-├── data/
-│   ├── docs/
-│   └── evaluation/
-│       └── eval_dataset.json
+src/
+├── client/
+├── config/
+├── evaluation/
+└── utils/
 │
-├── scripts/
-│   ├── ingest_docs.py
-│   └── init_db.sql
-│
-├── src/
-│   ├── client/
-│   │   ├── embedding_client.py
-│   │   ├── llm_client.py
-│   │   └── postgres_client.py
-│   │
-│   ├── config/
-│   │   └── settings.py
-│   │
-│   ├── evaluation/
-│   │   └── eval_dataset.py
-│   │
-│   └── search.py
+scripts/
+├── evaluate.py
+├── search.py
+└── init/
 │
 ├── docker-compose.yml
 ├── requirements.txt
@@ -166,13 +154,13 @@ This will:
 
 * Start PostgreSQL with pgvector
 * Create the database
-* Execute `scripts/init_db.sql`
+* Execute `scripts/init/init_db.sql`
 * Create a persistent Docker volume
 
 ### 6. Ingest documents
 
 ```bash
-python scripts/ingest_docs.py
+python scripts/init/ingest_docs.py
 ```
 
 This will:
@@ -215,7 +203,7 @@ Current evaluation focuses on validating whether the retrieval layer returns the
 The PostgreSQL schema is defined in:
 
 ```text
-scripts/init_db.sql
+scripts/init/init_db.sql
 ```
 
 The schema is automatically initialized during the first container startup.
@@ -230,7 +218,7 @@ docker compose up -d
 Then rerun ingestion:
 
 ```bash
-python scripts/ingest_docs.py
+python scripts/init/ingest_docs.py
 ```
 
 ---
