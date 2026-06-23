@@ -11,12 +11,12 @@ Usage:
     python ingest_docs.py
 """
 
-from pathlib import Path
-
 from src.client.embedding_client import embed_text
 from src.client.postgres_client import get_connection
 
-DOCS_DIR = Path("../data/docs")
+from src.utils.paths import ROOT_DIR
+
+DOCS_DIR = ROOT_DIR / "data/docs"
 CHUNK_SIZE = 400
 CHUNK_OVERLAP = 80
 
