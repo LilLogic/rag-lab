@@ -1,7 +1,12 @@
 import json
+import logging
 
 from src.client.embedding_client import embed_text
 from src.client.postgres_client import get_connection
+from src.utils.logging_config import setup_logging
+
+setup_logging()
+logger = logging.getLogger(__name__)
 
 TOP_K = 5
 
@@ -21,6 +26,7 @@ def retrieve(cursor, question: str, top_k: int = TOP_K):
         (embedded_question, top_k)
     )
     return cursor.fetchall()
+
 
 def reciprocal_rank(retrieved_sources, expected_sources):
     for rank, source in enumerate(retrieved_sources, start=1):
@@ -72,6 +78,7 @@ evaluations = []
 with get_connection() as conn:
     with conn.cursor() as cursor:
         for case in eval_dataset:
+            logger.info(f"Evaluating case: {case['question']}")
             evaluations.append(evaluate_case(cursor, case=case))
 
 total = len(evaluations)
