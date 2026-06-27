@@ -1,31 +1,13 @@
 import json
 import logging
 
-from src.client.embedding_client import embed_text
 from src.client.postgres_client import get_connection
-
+from src.retrieval.retriever import retrieve_with_cursor
 from src.utils.paths import ROOT_DIR
 
 logger = logging.getLogger(__name__)
 
 TOP_K = 5
-
-
-def retrieve(cursor, question: str, top_k: int = TOP_K):
-    embedded_question = embed_text(question)[0]
-
-    cursor.execute(
-        """
-        SELECT source,
-               content,
-               embedding <=> %s::vector as distance
-        FROM document_chunks
-        ORDER BY distance ASC
-            LIMIT %s
-        """,
-        (embedded_question, top_k)
-    )
-    return cursor.fetchall()
 
 
 def reciprocal_rank(retrieved_sources, expected_sources):
@@ -51,7 +33,7 @@ def evaluate_case(cursor, case):
     question = case["question"]
     expected_sources = set(case["expected_sources"])
 
-    results = retrieve(cursor, question)
+    results = retrieve_with_cursor(cursor, question, TOP_K)
     retrieved_sources = [row[0] for row in results]
 
     return {

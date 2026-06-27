@@ -5,24 +5,30 @@ from src.client.postgres_client import get_connection
 
 logger = logging.getLogger(__name__)
 
+TOP_K = 5
 
-def retrieve(question: str, top_k: int = 5):
-    logger.info("Retrieving top %s chunks", top_k)
+
+def retrieve_with_cursor(cursor, question: str, top_k: int = TOP_K):
+    logger.info(f"Retrieving top {top_k} chunks for question: {question}")
 
     embedded_question = embed_text(question)[0]
 
+    cursor.execute(
+        """
+        SELECT source,
+               content,
+               embedding <=> %s::vector AS distance
+        FROM document_chunks
+        ORDER BY distance ASC
+        LIMIT %s
+        """,
+        (embedded_question, top_k),
+    )
+
+    return cursor.fetchall()
+
+
+def retrieve(question: str, top_k: int = TOP_K):
     with get_connection() as conn:
         with conn.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT source,
-                       content,
-                       embedding <=> %s::vector AS distance
-                FROM document_chunks
-                ORDER BY distance ASC
-                LIMIT %s
-                """,
-                (embedded_question, top_k),
-            )
-
-            return cursor.fetchall()
+            return retrieve_with_cursor(cursor, question, top_k)
