@@ -9,7 +9,7 @@ TOP_K = 5
 
 
 def retrieve_with_cursor(cursor, question: str, top_k: int = TOP_K):
-    logger.info(f"Retrieving top {top_k} chunks for question: {question}")
+    logger.debug(f"Retrieving top {top_k} chunks for question: {question}")
 
     embedded_question = embed_text(question)[0]
 

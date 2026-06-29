@@ -2,6 +2,7 @@ import json
 import logging
 
 from src.client.postgres_client import get_connection
+from src.retrieval.report_writer import create_eval_run_dir, save_json
 from src.retrieval.retriever import retrieve_with_cursor
 from src.utils.paths import ROOT_DIR
 
@@ -56,6 +57,8 @@ def evaluate():
     with open(ROOT_DIR / "data/evaluation/eval_dataset.json", "r") as f:
         eval_dataset = json.load(f)
 
+    run_dir = create_eval_run_dir()
+
     evaluations = []
 
     with get_connection() as conn:
@@ -65,31 +68,57 @@ def evaluate():
                 evaluations.append(evaluate_case(cursor, case=case))
 
     total = len(evaluations)
-
     hit_at_1 = sum(e["hit_at_1"] for e in evaluations) / total
     hit_at_3 = sum(e["hit_at_3"] for e in evaluations) / total
     hit_at_5 = sum(e["hit_at_5"] for e in evaluations) / total
+    mrr = sum(e["mrr"] for e in evaluations) / total
+    precision_at_5 = sum(e["precision_at_5"] for e in evaluations) / total
+    recall_at_5 = sum(e["recall_at_5"] for e in evaluations) / total
+
+    summary = {
+        "total_questions": total,
+        "hit_at_1": hit_at_1,
+        "hit_at_3": hit_at_3,
+        "hit_at_5": hit_at_5,
+        "mrr": mrr,
+        "precision_at_5": precision_at_5,
+        "recall_at_5": recall_at_5
+    }
+
+    save_json(path=run_dir / "summary.json", data=summary)
 
     print("\nRETRIEVAL EVALUATION")
     print(f"Total questions: {total}")
     print(f"Hit@1: {hit_at_1:.2f}")
     print(f"Hit@3: {hit_at_3:.2f}")
     print(f"Hit@5: {hit_at_5:.2f}")
-
-    mrr = sum(e["mrr"] for e in evaluations) / total
-    precision_at_5 = sum(e["precision_at_5"] for e in evaluations) / total
-    recall_at_5 = sum(e["recall_at_5"] for e in evaluations) / total
-
     print(f"MRR: {mrr:.2f}")
     print(f"Precision@5: {precision_at_5:.2f}")
     print(f"Recall@5: {recall_at_5:.2f}")
 
+    details = list()
+
     for e in evaluations:
+        details.append({
+            "question": e["question"],
+            "expected_sources": sorted(e["expected_sources"]),
+            "retrieved_sources": e["retrieved_sources"],
+            "results": e["results"],
+            "hit_at_1": e["hit_at_1"],
+            "hit_at_3": e["hit_at_3"],
+            "hit_at_5": e["hit_at_5"],
+            "mrr": e["mrr"],
+            "precision_at_5": e["precision_at_5"],
+            "recall_at_5": e["recall_at_5"]
+        })
+
         print("\n" + "=" * 80)
         print(f"Question: {e['question']}")
-        print(f"Expected: {list(e['expected_sources'])}")
+        print(f"Expected: {sorted(e['expected_sources'])}")
         print(f"Retrieved: {e['retrieved_sources']}")
         print(f"Hit@1: {e['hit_at_1']} | Hit@3: {e['hit_at_3']} | Hit@5: {e['hit_at_5']}")
 
         for rank, row in enumerate(e["results"], start=1):
             print(f"{rank}. {row[0]} | distance={row[2]:.4f}")
+
+    save_json(path=run_dir / "details.json", data=details)
