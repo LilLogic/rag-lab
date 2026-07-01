@@ -6,6 +6,8 @@ from src.retrieval.report_writer import create_eval_run_dir, save_json
 from src.retrieval.retriever import retrieve_with_cursor
 from src.utils.paths import ROOT_DIR
 
+from src.config.settings import EMBEDDING_MODEL
+
 logger = logging.getLogger(__name__)
 
 TOP_K = 5
@@ -54,10 +56,23 @@ def evaluate_case(cursor, case):
 
 
 def evaluate():
-    with open(ROOT_DIR / "data/evaluation/eval_dataset.json", "r") as f:
+    run_dir = create_eval_run_dir()
+
+    eval_dataset_path = "data/evaluation/eval_dataset.json"
+    config = {
+        "top_k": TOP_K,
+        "eval_dataset_path": eval_dataset_path,
+        "reports_path": "reports/evaluation",
+        "retrieval_method": "pgvector_cosine_distance",
+        "embedding_model": EMBEDDING_MODEL
+    }
+
+    save_json(path=run_dir / "config.json", data=config)
+
+    with open(ROOT_DIR / eval_dataset_path, "r") as f:
         eval_dataset = json.load(f)
 
-    run_dir = create_eval_run_dir()
+
 
     evaluations = []
 
