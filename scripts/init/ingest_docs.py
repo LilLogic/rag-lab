@@ -13,24 +13,11 @@ Usage:
 
 from src.client.embedding_client import embed_text
 from src.client.postgres_client import get_connection
+from src.utils.chunker import chunk_text
 
 from src.utils.paths import ROOT_DIR
 
 DOCS_DIR = ROOT_DIR / "data/raw_docs"
-CHUNK_SIZE = 400
-CHUNK_OVERLAP = 80
-
-
-def chunk_text(text: str) -> list[str]:
-    chunks = []
-    start = 0
-
-    while start < len(text):
-        end = start + CHUNK_SIZE
-        chunks.append(text[start:end])
-        start += CHUNK_SIZE - CHUNK_OVERLAP
-
-    return chunks
 
 
 def reset_table(cur):

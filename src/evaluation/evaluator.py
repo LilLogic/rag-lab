@@ -6,6 +6,8 @@ from src.retrieval.report_writer import create_eval_run_dir, save_json
 from src.retrieval.retriever import retrieve_with_cursor
 from src.utils.paths import ROOT_DIR
 
+from src.utils.chunker import CHUNK_SIZE, CHUNK_OVERLAP
+
 from src.config.settings import EMBEDDING_MODEL
 
 logger = logging.getLogger(__name__)
@@ -64,7 +66,12 @@ def evaluate():
         "eval_dataset_path": eval_dataset_path,
         "reports_path": "reports/evaluation",
         "retrieval_method": "pgvector_cosine_distance",
-        "embedding_model": EMBEDDING_MODEL
+        "embedding_model": EMBEDDING_MODEL,
+        "chunking": {
+            "strategy": "fixed_size",
+            "chunk_size": CHUNK_SIZE,
+            "chunk_overlap": CHUNK_OVERLAP
+        }
     }
 
     save_json(path=run_dir / "config.json", data=config)
