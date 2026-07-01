@@ -46,6 +46,8 @@ Answer
 * [x] SSH authentication configured
 * [x] Add `README.md`
 * [x] Add `project_state.md`
+* [x] Improve repository code formatting
+* [x] Update GitHub repository description
 
 ### Infrastructure
 
@@ -103,7 +105,7 @@ Topics include:
 
 Current evaluation dataset:
 
-* ~4 manually curated questions
+* ~77 manually curated questions
 
 ---
 
@@ -113,7 +115,6 @@ Current evaluation dataset:
 
 Goal:
 
-* Increase from 4 questions to 20-50 questions
 * Improve metric reliability
 * Cover multiple retrieval scenarios
 
@@ -126,8 +127,6 @@ Goal:
 * [ ] Add retrieval failure analysis
 * [ ] Review retrieved chunks manually
 * [ ] Identify common retrieval mistakes
-* [ ] Improve repository code formatting
-* [ ] Update GitHub repository description
 
 ### Medium Priority
 
