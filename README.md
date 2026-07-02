@@ -22,6 +22,8 @@ Documents (.txt)
         ↓
 Chunking
         ↓
+LLM metadata enrichment
+        ↓
 Embeddings (Ollama)
         ↓
 PostgreSQL + pgvector
@@ -51,23 +53,30 @@ LLM Response
 
 ```text
 rag_lab/
-│
-src/
-├── client/
-├── config/
-├── evaluation/
-└── utils/
-│
-scripts/
-├── evaluate.py
-├── search.py
-├── retrieval/
-└── init/
-│
-├── docker-compose.yml
-├── requirements.txt
+├── data/
+│   ├── evaluation/
+│   └── raw_docs/
+├── scripts/
+│   ├── init/
+│   ├── ask_llm.py
+│   ├── evaluate.py
+│   └── retrieve.py
+├── src/
+│   ├── chunking/
+│   ├── client/
+│   ├── config/
+│   ├── evaluation/
+│   ├── llm/
+│   ├── models/
+│   ├── retrieval/
+│   ├── utils/
+│   └── __init__.py
 ├── .env.example
-└── README.md
+├── .python_version
+├── docker-compose.yml
+├── PROJECT_STATE.md
+├── README.md
+└── requirements.txt
 ```
 
 ---
