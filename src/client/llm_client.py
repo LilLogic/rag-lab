@@ -2,7 +2,8 @@ import requests
 
 from src.config.settings import OLLAMA_URL, LLM_MODEL
 
-def generate(prompt: str, stream: bool = False):
+
+def generate(prompt: str, stream: bool = False) -> str:
     response = requests.post(
         url=f"{OLLAMA_URL}/api/generate",
         json={

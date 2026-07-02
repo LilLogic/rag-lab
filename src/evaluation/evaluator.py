@@ -6,7 +6,7 @@ from src.retrieval.report_writer import create_eval_run_dir, save_json
 from src.retrieval.retriever import retrieve_with_cursor
 from src.utils.paths import ROOT_DIR
 
-from src.utils.chunker import CHUNK_SIZE, CHUNK_OVERLAP
+from src.chunking.chunker import CHUNK_SIZE, CHUNK_OVERLAP
 
 from src.config.settings import EMBEDDING_MODEL
 
