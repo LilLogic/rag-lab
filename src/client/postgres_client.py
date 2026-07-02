@@ -21,7 +21,7 @@ DB_CONFIG = {
 
 @contextmanager
 def get_connection():
-    conn = psycopg.connect(**DB_CONFIG)
+    conn = psycopg.connect(**DB_CONFIG, connect_timeout=3)
     try:
         yield conn
         conn.commit()
