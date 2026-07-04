@@ -5,18 +5,19 @@ setup_logging()
 
 
 def main():
-    question = "What is Docker Compose?"
+    question = "Explain cache invalidation."
 
-    results = retrieve(question, top_k=5)
+    results = retrieve(question, top_k=5, tags=["caching", "expiration"])
 
     print(f"\nQuestion: {question}\n")
 
     for i, row in enumerate(results, start=1):
-        source, content, distance = row
+        source, content, tags, distance = row
 
         print(f"Result {i}")
         print(f"Source: {source}")
         print(f"Distance: {distance}")
+        print(f"Tags: {tags}")
         print(f"Content: {content[:500]}")
         print("-" * 80)
 
