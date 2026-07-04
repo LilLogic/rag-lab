@@ -1,5 +1,5 @@
 from src.retrieval.retriever import retrieve
-from src.utils.logging_config import setup_logging
+from src.config.logging_config import setup_logging
 
 setup_logging()
 

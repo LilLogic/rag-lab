@@ -19,8 +19,8 @@ from src.ingestion.ingester import reset_table, insert_chunk
 from src.llm.tag_extractor import extract_tags
 from src.models.document_chunk import DocumentChunk
 from src.chunking.chunker import chunk_text, CHUNK_SIZE, CHUNK_OVERLAP
-from src.utils.logging_config import setup_logging
-from src.utils.paths import ROOT_DIR
+from src.config.logging_config import setup_logging
+from src.config.paths import ROOT_DIR
 
 setup_logging()
 logger = logging.getLogger(__name__)

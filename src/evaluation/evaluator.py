@@ -4,7 +4,7 @@ import logging
 from src.client.postgres_client import get_connection
 from src.retrieval.report_writer import create_eval_run_dir, save_json
 from src.retrieval.retriever import retrieve_with_cursor
-from src.utils.paths import ROOT_DIR
+from src.config.paths import ROOT_DIR
 
 from src.chunking.chunker import CHUNK_SIZE, CHUNK_OVERLAP
 

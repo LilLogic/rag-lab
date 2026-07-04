@@ -2,7 +2,7 @@ from datetime import datetime
 import json
 from pathlib import Path
 
-from src.utils.paths import ROOT_DIR
+from src.config.paths import ROOT_DIR
 
 
 def create_eval_run_dir(base_dir: Path = ROOT_DIR / "reports/evaluation") -> Path:
