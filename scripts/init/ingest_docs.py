@@ -15,6 +15,7 @@ import logging
 from src.client.embedding_client import embed_text
 from src.client.postgres_client import get_connection
 from src.config.settings import EMBEDDING_MODEL
+from src.ingestion.ingester import reset_table, insert_chunk
 from src.llm.tag_extractor import extract_tags
 from src.models.document_chunk import DocumentChunk
 from src.chunking.chunker import chunk_text, CHUNK_SIZE, CHUNK_OVERLAP
@@ -25,26 +26,6 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 DOCS_DIR = ROOT_DIR / "data/raw_docs"
-
-
-def reset_table(cur):
-    logger.info("Truncate table document_chunks")
-    cur.execute(
-        """
-        TRUNCATE TABLE document_chunks RESTART IDENTITY
-        """
-    )
-
-
-def insert_chunk(cursor, chunk: DocumentChunk):
-    logger.info(f"Inserting chunk {chunk.chunk_index} from {chunk.source}")
-    cursor.execute(
-        """
-        INSERT INTO document_chunks (source, content, embedding, tags, chunk_index, embedding_model, chunk_size, chunk_overlap)
-        VALUES (%s, %s, %s::vector, %s::text[], %s, %s, %s, %s)
-        """,
-        (chunk.source, chunk.content, chunk.embedding, chunk.tags, chunk.chunk_index, chunk.embedding_model, chunk.chunk_size, chunk.chunk_overlap),
-    )
 
 
 def main():
