@@ -12,15 +12,15 @@ Usage:
 """
 import logging
 
+from src.chunking.chunker import chunk_text, CHUNK_SIZE, CHUNK_OVERLAP
 from src.client.embedding_client import embed_text
 from src.client.postgres_client import get_connection
+from src.config.logging_config import setup_logging
+from src.config.paths import ROOT_DIR
 from src.config.settings import EMBEDDING_MODEL
 from src.ingestion.ingester import reset_table, insert_chunk
 from src.llm.tag_extractor import extract_tags
 from src.models.document_chunk import DocumentChunk
-from src.chunking.chunker import chunk_text, CHUNK_SIZE, CHUNK_OVERLAP
-from src.config.logging_config import setup_logging
-from src.config.paths import ROOT_DIR
 
 setup_logging()
 logger = logging.getLogger(__name__)
