@@ -11,14 +11,12 @@ def main():
 
     print(f"\nQuestion: {question}\n")
 
-    for i, row in enumerate(results, start=1):
-        source, content, tags, distance = row
-
+    for i, chunk in enumerate(results, start=1):
         print(f"Result {i}")
-        print(f"Source: {source}")
-        print(f"Distance: {distance}")
-        print(f"Tags: {tags}")
-        print(f"Content: {content[:500]}")
+        print(f"Source: {chunk.source}")
+        print(f"Distance: {chunk.distance}")
+        print(f"Tags: {chunk.tags}")
+        print(f"Content: {chunk.content[:500]}")
         print("-" * 80)
 
 

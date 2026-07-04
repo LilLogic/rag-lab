@@ -1,5 +1,6 @@
 import json
 import logging
+from dataclasses import asdict
 
 from src.client.postgres_client import get_connection
 from src.retrieval.report_writer import create_eval_run_dir, save_json
@@ -39,13 +40,13 @@ def evaluate_case(cursor, case):
     expected_sources = set(case["expected_sources"])
 
     results = retrieve_with_cursor(cursor, question, TOP_K)
-    retrieved_sources = [row[0] for row in results]
+    retrieved_sources = [chunk.source for chunk in results]
 
     return {
         "question": question,
         "expected_sources": expected_sources,
         "retrieved_sources": retrieved_sources,
-        "results": results,
+        "results": [asdict(chunk) for chunk in results],
 
         "hit_at_1": bool(expected_sources.intersection(retrieved_sources[:1])),
         "hit_at_3": bool(expected_sources.intersection(retrieved_sources[:3])),
@@ -141,6 +142,6 @@ def evaluate():
         print(f"Hit@1: {e['hit_at_1']} | Hit@3: {e['hit_at_3']} | Hit@5: {e['hit_at_5']}")
 
         for rank, row in enumerate(e["results"], start=1):
-            print(f"{rank}. {row[0]} | distance={row[2]:.4f}")
+            print(f"{rank}. {row["source"]} | distance={row["distance"]:.4f}")
 
     save_json(path=run_dir / "details.json", data=details)
