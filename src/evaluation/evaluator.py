@@ -6,7 +6,7 @@ from src.chunking.chunker import CHUNK_SIZE, CHUNK_OVERLAP
 from src.client.postgres_client import get_connection
 from src.config.paths import ROOT_DIR
 from src.config.settings import EMBEDDING_MODEL
-from src.evaluation.metrics import reciprocal_rank, precision_at_k, recall_at_k
+from src.evaluation.metrics import reciprocal_rank, precision_at_k, recall_at_k, hit_at_k
 from src.evaluation.report_writer import create_eval_run_dir, save_json
 from src.retrieval.retriever import retrieve_with_cursor
 
@@ -28,9 +28,9 @@ def evaluate_case(cursor, case):
         "retrieved_sources": retrieved_sources,
         "results": [asdict(chunk) for chunk in results],
 
-        "hit_at_1": bool(expected_sources.intersection(retrieved_sources[:1])),
-        "hit_at_3": bool(expected_sources.intersection(retrieved_sources[:3])),
-        "hit_at_5": bool(expected_sources.intersection(retrieved_sources[:5])),
+        "hit_at_1": hit_at_k(retrieved_sources, expected_sources, 1),
+        "hit_at_3": hit_at_k(retrieved_sources, expected_sources, 3),
+        "hit_at_5": hit_at_k(retrieved_sources, expected_sources, 5),
 
         "mrr": reciprocal_rank(retrieved_sources, expected_sources),
         "precision_at_5": precision_at_k(retrieved_sources, expected_sources, 5),

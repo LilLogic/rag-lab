@@ -15,3 +15,7 @@ def recall_at_k(retrieved_sources: list, expected_sources: set, k):
     retrieved_k = retrieved_sources[:k]
     hits = len(set(retrieved_k).intersection(expected_sources))
     return hits / len(expected_sources)
+
+
+def hit_at_k(retrieved_sources: list, expected_sources: set, k: int):
+    return bool(expected_sources.intersection(retrieved_sources[:k]))
