@@ -32,7 +32,7 @@ def evaluate_case(cursor, case):
         "hit_at_3": hit_at_k(retrieved_sources, expected_sources, 3),
         "hit_at_5": hit_at_k(retrieved_sources, expected_sources, 5),
 
-        "mrr": reciprocal_rank(retrieved_sources, expected_sources),
+        "reciprocal_rank": reciprocal_rank(retrieved_sources, expected_sources),
         "precision_at_5": precision_at_k(retrieved_sources, expected_sources, 5),
         "recall_at_5": recall_at_k(retrieved_sources, expected_sources, 5),
     }
@@ -68,34 +68,34 @@ def evaluate():
                 logger.info(f"Evaluating case {i + 1}/{len(eval_dataset)}: {case['question']}")
                 evaluations.append(evaluate_case(cursor, case=case))
 
-    total = len(evaluations)
-    hit_at_1 = sum(e["hit_at_1"] for e in evaluations) / total
-    hit_at_3 = sum(e["hit_at_3"] for e in evaluations) / total
-    hit_at_5 = sum(e["hit_at_5"] for e in evaluations) / total
-    mrr = sum(e["mrr"] for e in evaluations) / total
-    precision_at_5 = sum(e["precision_at_5"] for e in evaluations) / total
-    recall_at_5 = sum(e["recall_at_5"] for e in evaluations) / total
+    total_questions = len(evaluations)
+    mean_hit_at_1 = sum(e["hit_at_1"] for e in evaluations) / total_questions
+    mean_hit_at_3 = sum(e["hit_at_3"] for e in evaluations) / total_questions
+    mean_hit_at_5 = sum(e["hit_at_5"] for e in evaluations) / total_questions
+    mean_reciprocal_rank = sum(e["reciprocal_rank"] for e in evaluations) / total_questions
+    mean_precision_at_5 = sum(e["precision_at_5"] for e in evaluations) / total_questions
+    mean_recall_at_5 = sum(e["recall_at_5"] for e in evaluations) / total_questions
 
     summary = {
-        "total_questions": total,
-        "hit_at_1": hit_at_1,
-        "hit_at_3": hit_at_3,
-        "hit_at_5": hit_at_5,
-        "mrr": mrr,
-        "precision_at_5": precision_at_5,
-        "recall_at_5": recall_at_5
+        "total_questions": total_questions,
+        "mean_hit_at_1": mean_hit_at_1,
+        "mean_hit_at_3": mean_hit_at_3,
+        "mean_hit_at_5": mean_hit_at_5,
+        "mean_reciprocal_rank": mean_reciprocal_rank,
+        "mean_precision_at_5": mean_precision_at_5,
+        "mean_recall_at_5": mean_recall_at_5
     }
 
     save_json(path=run_dir / "summary.json", data=summary)
 
     print("\nRETRIEVAL EVALUATION")
-    print(f"Total questions: {total}")
-    print(f"Hit@1: {hit_at_1:.2f}")
-    print(f"Hit@3: {hit_at_3:.2f}")
-    print(f"Hit@5: {hit_at_5:.2f}")
-    print(f"MRR: {mrr:.2f}")
-    print(f"Precision@5: {precision_at_5:.2f}")
-    print(f"Recall@5: {recall_at_5:.2f}")
+    print(f"Total questions: {total_questions}")
+    print(f"Mean Hit@1: {mean_hit_at_1:.2f}")
+    print(f"Mean Hit@3: {mean_hit_at_3:.2f}")
+    print(f"Mean Hit@5: {mean_hit_at_5:.2f}")
+    print(f"Mean Reciprocal Rank: {mean_reciprocal_rank:.2f}")
+    print(f"Mean Precision@5: {mean_precision_at_5:.2f}")
+    print(f"Mean Recall@5: {mean_recall_at_5:.2f}")
 
     details = list()
 
@@ -108,7 +108,7 @@ def evaluate():
             "hit_at_1": e["hit_at_1"],
             "hit_at_3": e["hit_at_3"],
             "hit_at_5": e["hit_at_5"],
-            "mrr": e["mrr"],
+            "reciprocal_rank": e["reciprocal_rank"],
             "precision_at_5": e["precision_at_5"],
             "recall_at_5": e["recall_at_5"]
         })
