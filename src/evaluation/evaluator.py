@@ -2,10 +2,9 @@ import json
 import logging
 from dataclasses import asdict
 
-from src.chunking.chunker import CHUNK_SIZE, CHUNK_OVERLAP
 from src.client.postgres_client import get_connection
 from src.config.paths import ROOT_DIR
-from src.config.settings import EMBEDDING_MODEL
+from src.config.settings import EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP
 from src.evaluation.metrics import reciprocal_rank, precision_at_k, recall_at_k, hit_at_k
 from src.evaluation.report_writer import create_eval_run_dir, save_json
 from src.retrieval.retriever import retrieve_with_cursor

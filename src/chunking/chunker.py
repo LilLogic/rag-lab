@@ -1,5 +1,4 @@
-CHUNK_SIZE = 400
-CHUNK_OVERLAP = 80
+from src.config.settings import CHUNK_SIZE, CHUNK_OVERLAP
 
 
 def chunk_text(text: str, chunk_size: int = CHUNK_SIZE, chunk_overlap: int = CHUNK_OVERLAP) -> list[str]:
