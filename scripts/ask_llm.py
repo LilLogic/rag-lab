@@ -12,6 +12,6 @@ Write-through caching updates both the cache and underlying storage simultaneous
 
 More advanced systems use event-driven invalidation where updates trigger targeted cache eviction notifications across distributed nodes. Large-scale applications often combine multiple invalidation strategies to balance freshness, complexity, and infrastructure efficiency."""
 
-response = extract_tags(text=text)
+response = extract_tags(document_text=text)
 
 print(response)

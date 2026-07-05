@@ -66,11 +66,10 @@ rag_lab/
 │   ├── client/
 │   ├── config/
 │   ├── evaluation/
+│   ├── ingestion/
 │   ├── llm/
 │   ├── models/
-│   ├── retrieval/
-│   ├── utils/
-│   └── __init__.py
+│   └── retrieval/
 ├── .env.example
 ├── .python_version
 ├── docker-compose.yml
