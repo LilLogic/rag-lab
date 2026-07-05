@@ -2,37 +2,17 @@ import json
 import logging
 from dataclasses import asdict
 
+from src.chunking.chunker import CHUNK_SIZE, CHUNK_OVERLAP
 from src.client.postgres_client import get_connection
+from src.config.paths import ROOT_DIR
+from src.config.settings import EMBEDDING_MODEL
+from src.evaluation.metrics import reciprocal_rank, precision_at_k, recall_at_k
 from src.evaluation.report_writer import create_eval_run_dir, save_json
 from src.retrieval.retriever import retrieve_with_cursor
-from src.config.paths import ROOT_DIR
-
-from src.chunking.chunker import CHUNK_SIZE, CHUNK_OVERLAP
-
-from src.config.settings import EMBEDDING_MODEL
 
 logger = logging.getLogger(__name__)
 
 TOP_K = 5
-
-
-def reciprocal_rank(retrieved_sources, expected_sources):
-    for rank, source in enumerate(retrieved_sources, start=1):
-        if source in expected_sources:
-            return 1 / rank
-    return 0.0
-
-
-def precision_at_k(retrieved_sources, expected_sources, k):
-    retrieved_k = retrieved_sources[:k]
-    hits = sum(1 for source in retrieved_k if source in expected_sources)
-    return hits / k
-
-
-def recall_at_k(retrieved_sources, expected_sources, k):
-    retrieved_k = retrieved_sources[:k]
-    hits = len(set(retrieved_k).intersection(expected_sources))
-    return hits / len(expected_sources)
 
 
 def evaluate_case(cursor, case):
@@ -79,8 +59,6 @@ def evaluate():
 
     with open(ROOT_DIR / eval_dataset_path, "r") as f:
         eval_dataset = json.load(f)
-
-
 
     evaluations = []
 
