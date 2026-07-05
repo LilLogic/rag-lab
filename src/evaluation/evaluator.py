@@ -3,7 +3,7 @@ import logging
 from dataclasses import asdict
 
 from src.client.postgres_client import get_connection
-from src.retrieval.report_writer import create_eval_run_dir, save_json
+from src.evaluation.report_writer import create_eval_run_dir, save_json
 from src.retrieval.retriever import retrieve_with_cursor
 from src.config.paths import ROOT_DIR
 

@@ -2,7 +2,7 @@ import logging
 
 from src.client.embedding_client import embed_text
 from src.client.postgres_client import get_connection
-from src.models.RetrievedChunk import RetrievedChunk
+from src.models.retrieved_chunk import RetrievedChunk
 
 logger = logging.getLogger(__name__)
 
