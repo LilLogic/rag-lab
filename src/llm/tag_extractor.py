@@ -18,6 +18,10 @@ def extract_tags(document_text: str):
     
     {document_text}""")
 
-    response = generate(prompt)
+    tags_str = generate(prompt)
 
-    return [r.strip() for r in response.split(",")]
+    return parse_tags(tags_str)
+
+
+def parse_tags(tags_str: str):
+    return [tag.strip() for tag in tags_str.split(",")]
