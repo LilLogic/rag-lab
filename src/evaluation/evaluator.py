@@ -29,11 +29,11 @@ def evaluate_case(case: dict, retrieved_chunks: list[RetrievedChunk], top_k: int
 
         "hit_at_1": hit_at_k(retrieved_sources, expected_sources, k=1),
         "hit_at_3": hit_at_k(retrieved_sources, expected_sources, k=3),
-        "hit_at_5": hit_at_k(retrieved_sources, expected_sources, k=5),
+        f"hit_at_{top_k}": hit_at_k(retrieved_sources, expected_sources, k=top_k),
 
         "reciprocal_rank": reciprocal_rank(retrieved_sources, expected_sources),
-        "precision_at_top_k": precision_at_top_k(retrieved_sources, expected_sources, k=top_k),
-        "recall_at_top_k": recall_at_top_k(retrieved_sources, expected_sources, k=top_k),
+        f"precision_at_{top_k}": precision_at_top_k(retrieved_sources, expected_sources, k=top_k),
+        f"recall_at_{top_k}": recall_at_top_k(retrieved_sources, expected_sources, k=top_k),
     }
 
 
@@ -81,26 +81,26 @@ def evaluate(top_k: int = TOP_K):
         with conn.cursor() as cursor:
             evaluations = evaluate_cases(
                 eval_dataset=eval_dataset,
-                retrieve_fn=lambda _: retrieve_with_cursor(cursor, _, _),
+                retrieve_fn=lambda question, top_k: retrieve_with_cursor(cursor, question, top_k),
                 top_k=top_k
             )
 
     total_questions = len(evaluations)
     mean_hit_at_1 = sum(e["hit_at_1"] for e in evaluations) / total_questions
     mean_hit_at_3 = sum(e["hit_at_3"] for e in evaluations) / total_questions
-    mean_hit_at_5 = sum(e["hit_at_5"] for e in evaluations) / total_questions
+    mean_hit_at_top_k = sum(e[f"hit_at_{top_k}"] for e in evaluations) / total_questions
     mean_reciprocal_rank = sum(e["reciprocal_rank"] for e in evaluations) / total_questions
-    mean_precision_at_top_k = sum(e["precision_at_top_k"] for e in evaluations) / total_questions
-    mean_recall_at_top_k = sum(e["recall_at_top_k"] for e in evaluations) / total_questions
+    mean_precision_at_top_k = sum(e[f"precision_at_{top_k}"] for e in evaluations) / total_questions
+    mean_recall_at_top_k = sum(e[f"recall_at_{top_k}"] for e in evaluations) / total_questions
 
     summary = {
         "total_questions": total_questions,
         "mean_hit_at_1": mean_hit_at_1,
         "mean_hit_at_3": mean_hit_at_3,
-        "mean_hit_at_5": mean_hit_at_5,
+        f"mean_hit_at_{top_k}": mean_hit_at_top_k,
         "mean_reciprocal_rank": mean_reciprocal_rank,
-        "mean_precision_at_top_k": mean_precision_at_top_k,
-        "mean_recall_at_top_k": mean_recall_at_top_k
+        f"mean_precision_at_{top_k}": mean_precision_at_top_k,
+        f"mean_recall_at_{top_k}": mean_recall_at_top_k
     }
     save_json(path=run_dir / "summary.json", data=summary)
 
@@ -108,10 +108,10 @@ def evaluate(top_k: int = TOP_K):
     print(f"Total questions: {total_questions}")
     print(f"Mean Hit@1: {mean_hit_at_1:.2f}")
     print(f"Mean Hit@3: {mean_hit_at_3:.2f}")
-    print(f"Mean Hit@5: {mean_hit_at_5:.2f}")
+    print(f"Mean Hit@{top_k}: {mean_hit_at_top_k:.2f}")
     print(f"Mean Reciprocal Rank: {mean_reciprocal_rank:.2f}")
-    print(f"Mean Precision@top_k: {mean_precision_at_top_k:.2f}")
-    print(f"Mean Recall@top_k: {mean_recall_at_top_k:.2f}")
+    print(f"Mean Precision@{top_k}: {mean_precision_at_top_k:.2f}")
+    print(f"Mean Recall@{top_k}: {mean_recall_at_top_k:.2f}")
 
     details = list()
     for e in evaluations:
@@ -122,17 +122,17 @@ def evaluate(top_k: int = TOP_K):
             "results": e["results"],
             "hit_at_1": e["hit_at_1"],
             "hit_at_3": e["hit_at_3"],
-            "hit_at_5": e["hit_at_5"],
+            f"hit_at_{top_k}": e[f"hit_at_{top_k}"],
             "reciprocal_rank": e["reciprocal_rank"],
-            "precision_at_top_k": e["precision_at_top_k"],
-            "recall_at_top_k": e["recall_at_top_k"]
+            f"precision_at_{top_k}": e[f"precision_at_{top_k}"],
+            f"recall_at_{top_k}": e[f"recall_at_{top_k}"]
         })
 
         print("\n" + "=" * 80)
         print(f"Question: {e['question']}")
         print(f"Expected: {sorted(e['expected_sources'])}")
         print(f"Retrieved: {e['retrieved_sources']}")
-        print(f"Hit@1: {e['hit_at_1']} | Hit@3: {e['hit_at_3']} | Hit@5: {e['hit_at_5']}")
+        print(f"Hit@1: {e['hit_at_1']} | Hit@3: {e['hit_at_3']} | Hit@{top_k}: {e[f'hit_at_{top_k}']}")
 
         for rank, row in enumerate(e["results"], start=1):
             print(f"{rank}. {row["source"]} | distance={row["distance"]:.4f}")
