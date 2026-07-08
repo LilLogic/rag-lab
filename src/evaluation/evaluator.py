@@ -5,7 +5,7 @@ from dataclasses import asdict
 from src.client.postgres_client import get_connection
 from src.config.paths import ROOT_DIR
 from src.config.settings import EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP
-from src.evaluation.metrics import reciprocal_rank, precision_at_k, recall_at_k, hit_at_k
+from src.evaluation.metrics import reciprocal_rank, precision_at_top_k, recall_at_top_k, hit_at_k
 from src.evaluation.report_writer import create_eval_run_dir, save_json
 from src.models.retrieved_chunk import RetrievedChunk
 from src.retrieval.retriever import retrieve_with_cursor
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 TOP_K = 5
 
 
-def evaluate_case(case: dict, retrieved_chunks: list[RetrievedChunk], top_k: int = TOP_K) -> dict:
+def evaluate_case(case: dict, retrieved_chunks: list[RetrievedChunk], top_k: int) -> dict:
     question = case["question"]
     expected_sources = set(case["expected_sources"])
 
@@ -27,17 +27,17 @@ def evaluate_case(case: dict, retrieved_chunks: list[RetrievedChunk], top_k: int
         "retrieved_sources": retrieved_sources,
         "results": [asdict(chunk) for chunk in retrieved_chunks],
 
-        "hit_at_1": hit_at_k(retrieved_sources, expected_sources, 1),
-        "hit_at_3": hit_at_k(retrieved_sources, expected_sources, 3),
-        "hit_at_5": hit_at_k(retrieved_sources, expected_sources, 5),
+        "hit_at_1": hit_at_k(retrieved_sources, expected_sources, k=1),
+        "hit_at_3": hit_at_k(retrieved_sources, expected_sources, k=3),
+        "hit_at_5": hit_at_k(retrieved_sources, expected_sources, k=5),
 
         "reciprocal_rank": reciprocal_rank(retrieved_sources, expected_sources),
-        "precision_at_5": precision_at_k(retrieved_sources, expected_sources, 5),
-        "recall_at_5": recall_at_k(retrieved_sources, expected_sources, 5),
+        "precision_at_top_k": precision_at_top_k(retrieved_sources, expected_sources, k=top_k),
+        "recall_at_top_k": recall_at_top_k(retrieved_sources, expected_sources, k=top_k),
     }
 
 
-def evaluate_cases(eval_dataset: list[dict], retrieve_fn, top_k: int = TOP_K) -> list[dict]:
+def evaluate_cases(eval_dataset: list[dict], retrieve_fn, top_k) -> list[dict]:
     evaluations = []
 
     for i, case in enumerate(eval_dataset):
@@ -55,7 +55,7 @@ def evaluate_cases(eval_dataset: list[dict], retrieve_fn, top_k: int = TOP_K) ->
     return evaluations
 
 
-def evaluate():
+def evaluate(top_k: int = TOP_K):
     run_dir = create_eval_run_dir()
 
     eval_dataset_path = "data/evaluation/eval_dataset.json"
@@ -63,7 +63,7 @@ def evaluate():
         eval_dataset = json.load(f)
 
     config = {
-        "top_k": TOP_K,
+        "top_k": top_k,
         "eval_dataset_path": eval_dataset_path,
         "reports_path": "reports/evaluation",
         "retrieval_method": "pgvector_cosine_distance",
@@ -81,8 +81,8 @@ def evaluate():
         with conn.cursor() as cursor:
             evaluations = evaluate_cases(
                 eval_dataset=eval_dataset,
-                retrieve_fn=lambda question, top_k: retrieve_with_cursor(cursor, question, top_k),
-                top_k=TOP_K
+                retrieve_fn=lambda _: retrieve_with_cursor(cursor, _, _),
+                top_k=top_k
             )
 
     total_questions = len(evaluations)
@@ -90,8 +90,8 @@ def evaluate():
     mean_hit_at_3 = sum(e["hit_at_3"] for e in evaluations) / total_questions
     mean_hit_at_5 = sum(e["hit_at_5"] for e in evaluations) / total_questions
     mean_reciprocal_rank = sum(e["reciprocal_rank"] for e in evaluations) / total_questions
-    mean_precision_at_5 = sum(e["precision_at_5"] for e in evaluations) / total_questions
-    mean_recall_at_5 = sum(e["recall_at_5"] for e in evaluations) / total_questions
+    mean_precision_at_top_k = sum(e["precision_at_top_k"] for e in evaluations) / total_questions
+    mean_recall_at_top_k = sum(e["recall_at_top_k"] for e in evaluations) / total_questions
 
     summary = {
         "total_questions": total_questions,
@@ -99,8 +99,8 @@ def evaluate():
         "mean_hit_at_3": mean_hit_at_3,
         "mean_hit_at_5": mean_hit_at_5,
         "mean_reciprocal_rank": mean_reciprocal_rank,
-        "mean_precision_at_5": mean_precision_at_5,
-        "mean_recall_at_5": mean_recall_at_5
+        "mean_precision_at_top_k": mean_precision_at_top_k,
+        "mean_recall_at_top_k": mean_recall_at_top_k
     }
     save_json(path=run_dir / "summary.json", data=summary)
 
@@ -110,8 +110,8 @@ def evaluate():
     print(f"Mean Hit@3: {mean_hit_at_3:.2f}")
     print(f"Mean Hit@5: {mean_hit_at_5:.2f}")
     print(f"Mean Reciprocal Rank: {mean_reciprocal_rank:.2f}")
-    print(f"Mean Precision@5: {mean_precision_at_5:.2f}")
-    print(f"Mean Recall@5: {mean_recall_at_5:.2f}")
+    print(f"Mean Precision@top_k: {mean_precision_at_top_k:.2f}")
+    print(f"Mean Recall@top_k: {mean_recall_at_top_k:.2f}")
 
     details = list()
     for e in evaluations:
@@ -124,8 +124,8 @@ def evaluate():
             "hit_at_3": e["hit_at_3"],
             "hit_at_5": e["hit_at_5"],
             "reciprocal_rank": e["reciprocal_rank"],
-            "precision_at_5": e["precision_at_5"],
-            "recall_at_5": e["recall_at_5"]
+            "precision_at_top_k": e["precision_at_top_k"],
+            "recall_at_top_k": e["recall_at_top_k"]
         })
 
         print("\n" + "=" * 80)

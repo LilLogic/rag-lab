@@ -1,7 +1,7 @@
 from src.evaluation.metrics import (
     hit_at_k,
-    precision_at_k,
-    recall_at_k,
+    precision_at_top_k,
+    recall_at_top_k,
     reciprocal_rank,
 )
 
@@ -66,39 +66,39 @@ def test_precision_at_k_counts_relevant_sources_in_top_k():
     expected_sources = {"A.txt", "B.txt"}
     retrieved_sources = ["A.txt", "C.txt", "B.txt", "D.txt"]
 
-    assert precision_at_k(retrieved_sources, expected_sources, k=4) == 0.5
+    assert precision_at_top_k(retrieved_sources, expected_sources, k=4) == 0.5
 
 
 def test_precision_at_k_uses_only_top_k_results():
     expected_sources = {"A.txt", "B.txt"}
     retrieved_sources = ["A.txt", "C.txt", "D.txt", "B.txt"]
 
-    assert precision_at_k(retrieved_sources, expected_sources, k=3) == 1 / 3
+    assert precision_at_top_k(retrieved_sources, expected_sources, k=3) == 1 / 3
 
 
 def test_precision_at_k_returns_zero_when_no_relevant_sources_in_top_k():
     expected_sources = {"A.txt"}
     retrieved_sources = ["B.txt", "C.txt"]
 
-    assert precision_at_k(retrieved_sources, expected_sources, k=2) == 0.0
+    assert precision_at_top_k(retrieved_sources, expected_sources, k=2) == 0.0
 
 
 def test_recall_at_k_counts_fraction_of_expected_sources_found():
     expected_sources = {"A.txt", "B.txt", "C.txt"}
     retrieved_sources = ["A.txt", "D.txt", "B.txt"]
 
-    assert recall_at_k(retrieved_sources, expected_sources, k=3) == 2 / 3
+    assert recall_at_top_k(retrieved_sources, expected_sources, k=3) == 2 / 3
 
 
 def test_recall_at_k_uses_only_top_k_results():
     expected_sources = {"A.txt", "B.txt"}
     retrieved_sources = ["A.txt", "C.txt", "B.txt"]
 
-    assert recall_at_k(retrieved_sources, expected_sources, k=2) == 0.5
+    assert recall_at_top_k(retrieved_sources, expected_sources, k=2) == 0.5
 
 
 def test_recall_at_k_returns_zero_when_no_expected_sources_found():
     expected_sources = {"A.txt", "B.txt"}
     retrieved_sources = ["C.txt", "D.txt"]
 
-    assert recall_at_k(retrieved_sources, expected_sources, k=2) == 0.0
+    assert recall_at_top_k(retrieved_sources, expected_sources, k=2) == 0.0

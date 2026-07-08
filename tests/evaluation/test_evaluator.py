@@ -33,5 +33,5 @@ def test_evaluate_cases_with_retrieved_chunks():
     assert evaluations[0]["retrieved_sources"] == ["42.txt"]
     assert evaluations[0]["hit_at_1"] is True
     assert evaluations[0]["reciprocal_rank"] == 1.0
-    assert evaluations[0]["precision_at_5"] == 1 / 5
-    assert evaluations[0]["recall_at_5"] == 1.0
+    assert evaluations[0]["precision_at_top_k"] == 1 / 5
+    assert evaluations[0]["recall_at_top_k"] == 1.0
