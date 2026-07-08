@@ -7,6 +7,7 @@ from src.config.paths import ROOT_DIR
 from src.config.settings import EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP
 from src.evaluation.metrics import reciprocal_rank, precision_at_k, recall_at_k, hit_at_k
 from src.evaluation.report_writer import create_eval_run_dir, save_json
+from src.models.retrieved_chunk import RetrievedChunk
 from src.retrieval.retriever import retrieve_with_cursor
 
 logger = logging.getLogger(__name__)
@@ -14,18 +15,17 @@ logger = logging.getLogger(__name__)
 TOP_K = 5
 
 
-def evaluate_case(cursor, case):
+def evaluate_case(case: dict, retrieved_chunks: list[RetrievedChunk], top_k: int = TOP_K) -> dict:
     question = case["question"]
     expected_sources = set(case["expected_sources"])
 
-    results = retrieve_with_cursor(cursor, question, TOP_K)
-    retrieved_sources = [chunk.source for chunk in results]
+    retrieved_sources = [chunk.source for chunk in retrieved_chunks]
 
     return {
         "question": question,
         "expected_sources": expected_sources,
         "retrieved_sources": retrieved_sources,
-        "results": [asdict(chunk) for chunk in results],
+        "results": [asdict(chunk) for chunk in retrieved_chunks],
 
         "hit_at_1": hit_at_k(retrieved_sources, expected_sources, 1),
         "hit_at_3": hit_at_k(retrieved_sources, expected_sources, 3),
@@ -37,10 +37,31 @@ def evaluate_case(cursor, case):
     }
 
 
+def evaluate_cases(eval_dataset: list[dict], retrieve_fn, top_k: int = TOP_K) -> list[dict]:
+    evaluations = []
+
+    for i, case in enumerate(eval_dataset):
+        logger.info(f"Evaluating case {i + 1}/{len(eval_dataset)}: {case['question']}")
+
+        retrieved_chunks = retrieve_fn(case["question"], top_k)
+        evaluations.append(
+            evaluate_case(
+                case=case,
+                retrieved_chunks=retrieved_chunks,
+                top_k=top_k
+            )
+        )
+
+    return evaluations
+
+
 def evaluate():
     run_dir = create_eval_run_dir()
 
     eval_dataset_path = "data/evaluation/eval_dataset.json"
+    with open(ROOT_DIR / eval_dataset_path, "r") as f:
+        eval_dataset = json.load(f)
+
     config = {
         "top_k": TOP_K,
         "eval_dataset_path": eval_dataset_path,
@@ -53,19 +74,16 @@ def evaluate():
             "chunk_overlap": CHUNK_OVERLAP
         }
     }
-
     save_json(path=run_dir / "config.json", data=config)
 
-    with open(ROOT_DIR / eval_dataset_path, "r") as f:
-        eval_dataset = json.load(f)
-
     evaluations = []
-
     with get_connection() as conn:
         with conn.cursor() as cursor:
-            for i, case in enumerate(eval_dataset):
-                logger.info(f"Evaluating case {i + 1}/{len(eval_dataset)}: {case['question']}")
-                evaluations.append(evaluate_case(cursor, case=case))
+            evaluations = evaluate_cases(
+                eval_dataset=eval_dataset,
+                retrieve_fn=lambda question, top_k: retrieve_with_cursor(cursor, question, top_k),
+                top_k=TOP_K
+            )
 
     total_questions = len(evaluations)
     mean_hit_at_1 = sum(e["hit_at_1"] for e in evaluations) / total_questions
@@ -84,7 +102,6 @@ def evaluate():
         "mean_precision_at_5": mean_precision_at_5,
         "mean_recall_at_5": mean_recall_at_5
     }
-
     save_json(path=run_dir / "summary.json", data=summary)
 
     print("\nRETRIEVAL EVALUATION")
@@ -97,7 +114,6 @@ def evaluate():
     print(f"Mean Recall@5: {mean_recall_at_5:.2f}")
 
     details = list()
-
     for e in evaluations:
         details.append({
             "question": e["question"],
