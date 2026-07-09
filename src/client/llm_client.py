@@ -13,9 +13,6 @@ def generate(prompt: str, stream: bool = False) -> str:
         },
         timeout=120
     )
-
     response.raise_for_status()
-
     data = response.json()
-
     return data["response"]
