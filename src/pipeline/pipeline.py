@@ -11,7 +11,7 @@ def answer_question(question: str):
     logger.debug(f"document_chunks: {document_chunks}")
 
     prompt = f"Answer the following question only using the provided sources.\n\nQuestion: {question}\n\nSources: \n{"\n".join([chunk.content for chunk in document_chunks])}"
-    logger.info(f"prompt: {prompt}")
+    logger.debug(f"prompt: {prompt}")
 
     response = generate(prompt)
     logger.debug(f"response: {response}")
