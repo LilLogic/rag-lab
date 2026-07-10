@@ -4,15 +4,13 @@ from dataclasses import asdict
 
 from src.client.postgres_client import get_connection
 from src.config.paths import ROOT_DIR
-from src.config.settings import EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP
+from src.config.settings import EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP, DEFAULT_TOP_K
 from src.evaluation.metrics import reciprocal_rank, precision_at_top_k, recall_at_top_k, hit_at_k
 from src.evaluation.report_writer import create_eval_run_dir, save_json
 from src.models.retrieved_chunk import RetrievedChunk
 from src.retrieval.retriever import retrieve_with_cursor
 
 logger = logging.getLogger(__name__)
-
-TOP_K = 5
 
 
 def evaluate_case(case: dict, retrieved_chunks: list[RetrievedChunk], top_k: int) -> dict:
@@ -55,7 +53,7 @@ def evaluate_cases(eval_dataset: list[dict], retrieve_fn, top_k) -> list[dict]:
     return evaluations
 
 
-def evaluate(top_k: int = TOP_K):
+def evaluate(top_k: int = DEFAULT_TOP_K):
     run_dir = create_eval_run_dir()
 
     eval_dataset_path = "data/evaluation/eval_dataset.json"

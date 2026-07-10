@@ -2,14 +2,13 @@ import logging
 
 from src.client.embedding_client import embed_text
 from src.client.postgres_client import get_connection
+from src.config.settings import DEFAULT_TOP_K
 from src.models.retrieved_chunk import RetrievedChunk
 
 logger = logging.getLogger(__name__)
 
-TOP_K = 5
 
-
-def retrieve_with_cursor(cursor, question: str, top_k: int = TOP_K, tags: list[str] | None = None) -> list[RetrievedChunk]:
+def retrieve_with_cursor(cursor, question: str, top_k: int = DEFAULT_TOP_K, tags: list[str] | None = None) -> list[RetrievedChunk]:
     logger.debug(f"Retrieving top {top_k} chunks for question: {question}")
 
     embedded_question = embed_text(question)[0]
@@ -59,7 +58,6 @@ def retrieve_with_cursor(cursor, question: str, top_k: int = TOP_K, tags: list[s
                 distance=row[2],
             ) for row in rows
         ]
-
 
 
 def retrieve(question: str, top_k: int = TOP_K, tags: list[str] | None = None) -> list[RetrievedChunk]:

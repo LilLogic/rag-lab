@@ -14,5 +14,7 @@ OLLAMA_URL = os.getenv("OLLAMA_URL")
 
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL")
 LLM_MODEL = os.getenv("LLM_MODEL")
+
 CHUNK_SIZE = os.getenv("CHUNK_SIZE")
 CHUNK_OVERLAP = os.getenv("CHUNK_OVERLAP")
+DEFAULT_TOP_K = os.getenv("DEFAULT_TOP_K")
