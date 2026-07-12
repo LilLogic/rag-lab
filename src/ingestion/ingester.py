@@ -6,12 +6,11 @@ logger = logging.getLogger(__name__)
 
 
 def reset_table(cur):
-    logger.info("Truncate table document_chunks")
-    cur.execute(
+    query = """
+        TRUNCATE TABLE ingestion_runs CASCADE
         """
-        TRUNCATE TABLE document_chunks RESTART IDENTITY
-        """
-    )
+    logger.info(query)
+    cur.execute(query)
 
 
 def insert_chunk(cursor, chunk: DocumentChunk):
