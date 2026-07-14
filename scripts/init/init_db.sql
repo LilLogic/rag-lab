@@ -34,7 +34,7 @@ CREATE INDEX IF NOT EXISTS document_chunks_ingestion_run_idx
 
 CREATE TABLE IF NOT EXISTS chunk_embeddings_768
 (
-    chunk_id  INTEGER PRIMARY KEY
+    document_chunk_id  INTEGER PRIMARY KEY
         REFERENCES document_chunks (id)
             ON DELETE CASCADE,
 

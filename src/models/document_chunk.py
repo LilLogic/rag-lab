@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from typing import List
+from uuid import UUID
+
 
 @dataclass
 class DocumentChunk:
-     source: str
-     content: str
-     embedding: List[float]
-     tags: List[str]
-     chunk_index: int
-     embedding_model: str
-     chunk_size: int
-     chunk_overlap: int
+    source: str
+    content: str
+    tags: List[str]
+    metadata: dict
+    chunk_index: int
+    ingestion_run_id: UUID

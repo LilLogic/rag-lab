@@ -1,24 +1,58 @@
 import logging
 
+from psycopg.types.json import Jsonb
+
 from src.models.document_chunk import DocumentChunk
+from src.models.ingestion_run import IngestionRun
 
 logger = logging.getLogger(__name__)
 
 
-def reset_table(cur):
+def truncate_cascade(cur):
     query = """
-        TRUNCATE TABLE ingestion_runs CASCADE
-        """
+            TRUNCATE TABLE ingestion_runs CASCADE \
+            """
     logger.info(query)
     cur.execute(query)
 
 
-def insert_chunk(cursor, chunk: DocumentChunk):
-    logger.info(f"Inserting chunk {chunk.chunk_index} from {chunk.source}")
+def insert_document_chunk(cursor, chunk: DocumentChunk):
+    logger.info(f"Inserting {chunk.chunk_index=} from {chunk.source}")
     cursor.execute(
         """
-        INSERT INTO document_chunks (source, content, embedding, tags, chunk_index, embedding_model, chunk_size, chunk_overlap)
-        VALUES (%s, %s, %s::vector, %s::text[], %s, %s, %s, %s)
+        INSERT INTO document_chunks (source, content, tags, chunk_index, metadata, ingestion_run_id)
+        VALUES (%s, %s, %s::TEXT[], %s, %s, %s::UUID)
+        RETURNING id
         """,
-        (chunk.source, chunk.content, chunk.embedding, chunk.tags, chunk.chunk_index, chunk.embedding_model, chunk.chunk_size, chunk.chunk_overlap),
+        (chunk.source, chunk.content, chunk.tags, chunk.chunk_index, Jsonb(chunk.metadata), chunk.ingestion_run_id),
+    )
+
+    row = cursor.fetchone()
+
+    if row is None:
+        raise Exception("The chunk insert did not return an id")
+
+    chunk_id = row[0]
+    return chunk_id
+
+
+def insert_ingestion_run(cursor, ingestion_run: IngestionRun):
+    logger.info(f"Inserting ingestion run {ingestion_run.id}")
+    cursor.execute(
+        """
+        INSERT INTO ingestion_runs (id, chunking_strategy, embedding_config, chunking_config)
+        VALUES (%s::UUID, %s, %s, %s)
+        """,
+        (ingestion_run.id, ingestion_run.chunking_strategy, Jsonb(ingestion_run.embedding_config), Jsonb(ingestion_run.chunking_config))
+    )
+
+
+def insert_chunk_embedding(cursor, document_chunk_id: int, embedding: list[float]):
+    logger.info(f"Inserting embedding for document_chunk_id {document_chunk_id}")
+    cursor.execute(
+        """
+        INSERT INTO chunk_embeddings_768 (document_chunk_id, embedding)
+        VALUES (%s, %s::vector)
+        """,
+        (document_chunk_id, embedding),
     )
