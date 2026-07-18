@@ -2,7 +2,6 @@ import requests
 
 from src.config.settings import (
     OLLAMA_URL,
-    EMBEDDING_MODEL
 )
 
 

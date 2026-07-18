@@ -1,20 +1,21 @@
 import logging
-from uuid import UUID
 
 from src.client.embedding_client import embed_text
 from src.client.postgres_client import get_connection
-from src.config.settings import DEFAULT_TOP_K, EMBEDDING_MODEL
+from src.config.settings import DEFAULT_TOP_K
+from src.models.ingestion_run import IngestionRun
 from src.models.retrieved_chunk import RetrievedChunk
 
 logger = logging.getLogger(__name__)
 
 
-def retrieve_with_cursor(cursor, question: str, ingestion_run_id: UUID, top_k: int = DEFAULT_TOP_K, tags: list[str] | None = None) -> list[RetrievedChunk]:
+def retrieve_with_cursor(cursor, question: str, ingestion_run: IngestionRun, top_k: int = DEFAULT_TOP_K, tags: list[str] | None = None) -> list[
+    RetrievedChunk]:
     logger.debug(f"Retrieving top {top_k} chunks for question: {question}")
 
     embedded_question = embed_text(
         input_value=question,
-        embedding_model=EMBEDDING_MODEL
+        embedding_model=ingestion_run.embedding_config["embedding_model"]
     )[0]
 
     if tags:
@@ -64,7 +65,13 @@ def retrieve_with_cursor(cursor, question: str, ingestion_run_id: UUID, top_k: i
         ]
 
 
-def retrieve(question: str, ingestion_run_id: UUID, top_k: int, tags: list[str] | None = None) -> list[RetrievedChunk]:
+def retrieve(question: str, ingestion_run: IngestionRun, top_k: int, tags: list[str] | None = None) -> list[RetrievedChunk]:
     with get_connection() as conn:
         with conn.cursor() as cursor:
-            return retrieve_with_cursor(cursor, question, ingestion_run_id, top_k, tags)
+            return retrieve_with_cursor(
+                cursor=cursor,
+                question=question,
+                ingestion_run=ingestion_run,
+                top_k=top_k,
+                tags=tags
+            )

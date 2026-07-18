@@ -69,7 +69,10 @@ def main():
                 metadata = {}
 
                 for e, chunk in enumerate(chunks):
-                    embedding = embed_text(input_value=chunk, embedding_model=EMBEDDING_MODEL)[0]
+                    embedding = embed_text(
+                        input_value=chunk,
+                        embedding_model=ingestion_run.embedding_config["embedding_model"]
+                    )[0]
                     document_chunk = DocumentChunk(
                         ingestion_run_id=ingestion_run_id,
                         source=file_path.name,

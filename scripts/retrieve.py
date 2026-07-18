@@ -1,3 +1,6 @@
+from src.client.postgres_client import get_connection
+from src.config.settings import DEFAULT_INGESTION_RUN_ID
+from src.ingestion.ingester import get_ingestion_run_by_id
 from src.retrieval.retriever import retrieve
 from src.config.logging_config import setup_logging
 
@@ -7,7 +10,19 @@ setup_logging()
 def main():
     question = "Explain cache invalidation."
 
-    results = retrieve(question, top_k=5, tags=["caching", "expiration"])
+    with get_connection() as conn:
+        with conn.cursor() as cursor:
+            ingestion_run = get_ingestion_run_by_id(
+                        cursor=cursor,
+                        ingestion_run_id=DEFAULT_INGESTION_RUN_ID
+                    )
+
+    results = retrieve(
+        question=question,
+        ingestion_run=ingestion_run,
+        top_k=5,
+        tags=["caching", "expiration"]
+    )
 
     print(f"\nQuestion: {question}\n")
 
