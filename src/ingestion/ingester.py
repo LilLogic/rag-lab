@@ -1,4 +1,5 @@
 import logging
+from uuid import UUID
 
 from psycopg.types.json import Jsonb
 
@@ -56,3 +57,27 @@ def insert_chunk_embedding(cursor, document_chunk_id: int, embedding: list[float
         """,
         (document_chunk_id, embedding),
     )
+
+
+def get_ingestion_run_by_id(cursor, ingestion_run_id: UUID):
+    logger.info(f"Getting ingestion run by id {ingestion_run_id}")
+    cursor.execute(
+        """
+        SELECT id, chunking_strategy, embedding_config, chunking_config 
+        FROM ingestion_runs 
+        WHERE id = %s::UUID
+        """,
+        (ingestion_run_id,)
+    )
+    row = cursor.fetchone()
+    if row is None:
+        raise Exception(f"Ingestion run with id {ingestion_run_id} not found")
+
+    ingestion_run = IngestionRun(
+        id=row[0],
+        chunking_strategy=row[1],
+        embedding_config=row[2],
+        chunking_config=row[3]
+    )
+
+    return ingestion_run

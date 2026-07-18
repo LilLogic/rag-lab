@@ -1,4 +1,5 @@
 import os
+from uuid import UUID
 
 from dotenv import load_dotenv
 
@@ -18,3 +19,5 @@ LLM_MODEL = os.getenv("LLM_MODEL")
 CHUNK_SIZE = int(os.getenv("CHUNK_SIZE"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP"))
 DEFAULT_TOP_K = int(os.getenv("DEFAULT_TOP_K"))
+
+DEFAULT_INGESTION_RUN_ID = UUID(os.getenv("DEFAULT_INGESTION_RUN_ID"))
