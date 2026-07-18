@@ -63,8 +63,8 @@ def get_ingestion_run_by_id(cursor, ingestion_run_id: UUID):
     logger.info(f"Getting ingestion run by id {ingestion_run_id}")
     cursor.execute(
         """
-        SELECT id, chunking_strategy, embedding_config, chunking_config 
-        FROM ingestion_runs 
+        SELECT id, chunking_strategy, embedding_config, chunking_config
+        FROM ingestion_runs
         WHERE id = %s::UUID
         """,
         (ingestion_run_id,)
