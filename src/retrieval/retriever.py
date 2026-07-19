@@ -63,7 +63,8 @@ def retrieve_with_cursor(cursor, embedded_question: list[float], ingestion_run: 
         ]
 
 
-def retrieve(embedded_question: list[float], ingestion_run: IngestionRun, top_k: int, tags: list[str] | None = None) -> list[RetrievedChunk]:
+def retrieve(embedded_question: list[float], ingestion_run: IngestionRun, top_k: int = DEFAULT_TOP_K, tags: list[str] | None = None) -> list[
+    RetrievedChunk]:
     with get_connection() as conn:
         with conn.cursor() as cursor:
             return retrieve_with_cursor(
