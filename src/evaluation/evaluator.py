@@ -4,9 +4,9 @@ from dataclasses import asdict
 
 from src.client.postgres_client import get_connection
 from src.config.paths import ROOT_DIR
-from src.config.settings import EMBEDDING_MODEL, CHUNK_SIZE, CHUNK_OVERLAP, DEFAULT_TOP_K
 from src.evaluation.metrics import reciprocal_rank, precision_at_top_k, recall_at_top_k, hit_at_k
 from src.evaluation.report_writer import create_eval_run_dir, save_json
+from src.models.ingestion_run import IngestionRun
 from src.models.retrieved_chunk import RetrievedChunk
 from src.retrieval.retriever import retrieve_with_cursor
 
@@ -53,7 +53,7 @@ def evaluate_cases(eval_dataset: list[dict], retrieve_fn, top_k) -> list[dict]:
     return evaluations
 
 
-def evaluate(top_k: int = DEFAULT_TOP_K):
+def evaluate(ingestion_run: IngestionRun, top_k: int):
     run_dir = create_eval_run_dir()
 
     eval_dataset_path = "data/evaluation/eval_dataset.json"
@@ -65,11 +65,11 @@ def evaluate(top_k: int = DEFAULT_TOP_K):
         "eval_dataset_path": eval_dataset_path,
         "reports_path": "reports/evaluation",
         "retrieval_method": "pgvector_cosine_distance",
-        "embedding_model": EMBEDDING_MODEL,
+        "embedding_model": ingestion_run.embedding_config["embedding_model"],
         "chunking": {
-            "strategy": "fixed_size",
-            "chunk_size": CHUNK_SIZE,
-            "chunk_overlap": CHUNK_OVERLAP
+            "strategy": ingestion_run.chunking_strategy,
+            "chunk_size": ingestion_run.chunking_config["chunk_size"],
+            "chunk_overlap": ingestion_run.chunking_config["chunk_overlap"],
         }
     }
     save_json(path=run_dir / "config.json", data=config)
@@ -79,7 +79,7 @@ def evaluate(top_k: int = DEFAULT_TOP_K):
         with conn.cursor() as cursor:
             evaluations = evaluate_cases(
                 eval_dataset=eval_dataset,
-                retrieve_fn=lambda question, top_k: retrieve_with_cursor(cursor, question, top_k),
+                retrieve_fn=lambda question, top_k: retrieve_with_cursor(cursor=cursor, ingestion_run=ingestion_run, question=question, top_k=top_k),
                 top_k=top_k
             )
 
