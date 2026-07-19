@@ -21,7 +21,7 @@ def main():
         question=question,
         ingestion_run=ingestion_run,
         top_k=5,
-        #tags=["caching", "expiration"]
+        tags=["caching", "expiration"]
     )
 
     print(f"\nQuestion: {question}\n")
