@@ -45,14 +45,17 @@ def retrieve_with_cursor(cursor, question: str, ingestion_run: IngestionRun, top
     else:
         cursor.execute(
             """
-            SELECT source,
-                   content,
-                   embedding <=> %s::vector AS distance
-            FROM document_chunks
+            SELECT dc.source,
+                   dc.content,
+                   ce.embedding <=> %s::vector AS distance
+            FROM document_chunks dc
+            INNER JOIN ingestion_runs ir ON dc.ingestion_run_id = ir.id
+            INNER JOIN chunk_embeddings_768 ce ON dc.id = ce.document_chunk_id
+            WHERE ir.id = %s::UUID
             ORDER BY distance
             LIMIT %s
             """,
-            (embedded_question, top_k),
+            (embedded_question, ingestion_run.id, top_k),
         )
         rows = cursor.fetchall()
         return [
