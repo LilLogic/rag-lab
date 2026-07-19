@@ -20,6 +20,7 @@ if __name__ == "__main__":
 
     response = answer_question(
         ingestion_run=ingestion_run,
+        question=question,
         embedded_question=embedded_question
     )
     print(response)
