@@ -399,7 +399,7 @@ A chunk is eligible when at least one of its stored tags overlaps with the suppl
 ### Test the LLM client
 
 ```bash
-python scripts/ask_llm.py
+python scripts/scratch_llm.py
 ```
 
 This is a development utility for experimenting directly with the configured generation model.
