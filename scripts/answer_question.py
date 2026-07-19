@@ -1,3 +1,5 @@
+import logging
+
 from src.client.embedding_client import embed_text
 from src.client.postgres_client import get_connection
 from src.config.logging_config import setup_logging
@@ -5,7 +7,7 @@ from src.config.settings import DEFAULT_INGESTION_RUN_ID
 from src.ingestion.ingester import get_ingestion_run_by_id
 from src.pipeline.pipeline import answer_question
 
-setup_logging()
+setup_logging(level=logging.DEBUG)
 
 if __name__ == "__main__":
     with get_connection() as conn:

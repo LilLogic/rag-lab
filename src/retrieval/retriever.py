@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 def retrieve_with_cursor(cursor, embedded_question: list[float], ingestion_run: IngestionRun, top_k: int = DEFAULT_TOP_K,
                          tags: list[str] | None = None) -> list[RetrievedChunk]:
-    logger.debug(f"Retrieving top {top_k} chunks for question: {embedded_question}")
+    logger.debug(f"Retrieving {top_k=} chunks")
 
     if tags:
         cursor.execute(
