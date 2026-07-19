@@ -31,14 +31,14 @@ def test_evaluate_cases_with_retrieved_chunks():
         chunking_config={"chunk_size": 100}
     )
 
-    def fake_embed_fn(input_value, embedding_model):
-        return [[1.0, 1.0, 1.0, 1.0, 1.0]]
+    fake_embed_fn = lambda input_value: [1.0, 1.0, 1.0, 1.0, 1.0]
 
-    def fake_retrieve(question, top_k):
+    def fake_retrieve(embedded_question, top_k):
+        assert embedded_question == [1.0, 1.0, 1.0, 1.0, 1.0]
+        assert top_k == 5
         return retrieved_chunks
 
     evaluations = evaluate_cases(
-        ingestion_run=ingestion_run,
         eval_dataset=eval_dataset,
         embed_fn=fake_embed_fn,
         retrieve_fn=fake_retrieve,

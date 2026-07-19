@@ -20,9 +20,8 @@ def retrieve_with_cursor(cursor, embedded_question: list[float], ingestion_run: 
                    dc.tags,
                    ce.embedding <=> %s::vector AS distance
             FROM document_chunks dc
-                     INNER JOIN ingestion_runs ir ON dc.ingestion_run_id = ir.id
                      INNER JOIN chunk_embeddings_768 ce ON dc.id = ce.document_chunk_id
-            WHERE ir.id = %s::UUID
+            WHERE dc.ingestion_run_id = %s::UUID
               AND tags && %s::text[]
             ORDER BY distance
             LIMIT %s
@@ -46,9 +45,8 @@ def retrieve_with_cursor(cursor, embedded_question: list[float], ingestion_run: 
                    dc.content,
                    ce.embedding <=> %s::vector AS distance
             FROM document_chunks dc
-                     INNER JOIN ingestion_runs ir ON dc.ingestion_run_id = ir.id
                      INNER JOIN chunk_embeddings_768 ce ON dc.id = ce.document_chunk_id
-            WHERE ir.id = %s::UUID
+            WHERE dc.ingestion_run_id = %s::UUID
             ORDER BY distance
             LIMIT %s
             """,

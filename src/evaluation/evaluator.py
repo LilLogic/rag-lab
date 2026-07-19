@@ -36,16 +36,13 @@ def evaluate_case(case: dict, retrieved_chunks: list[RetrievedChunk], top_k: int
     }
 
 
-def evaluate_cases(ingestion_run: IngestionRun, eval_dataset: list[dict], embed_fn, retrieve_fn, top_k: int) -> list[dict]:
+def evaluate_cases(eval_dataset: list[dict], embed_fn, retrieve_fn, top_k: int) -> list[dict]:
     evaluations = []
 
     for i, case in enumerate(eval_dataset):
         logger.info(f"Evaluating case {i + 1}/{len(eval_dataset)}: {case['question']}")
 
-        embedded_question = embed_fn(
-            input_value=case["question"],
-            embedding_model=ingestion_run.embedding_config["embedding_model"]
-        )[0]
+        embedded_question = embed_fn(input_value=case["question"])
 
         retrieved_chunks = retrieve_fn(embedded_question, top_k)
         evaluations.append(
@@ -67,6 +64,7 @@ def evaluate(ingestion_run: IngestionRun, top_k: int):
         eval_dataset = json.load(f)
 
     config = {
+        "ingestion_run_id": str(ingestion_run.id),
         "top_k": top_k,
         "eval_dataset_path": eval_dataset_path,
         "reports_path": "reports/evaluation",
@@ -80,14 +78,14 @@ def evaluate(ingestion_run: IngestionRun, top_k: int):
     }
     save_json(path=run_dir / "config.json", data=config)
 
-    embed_fn = lambda input_value, embedding_model: embed_text(input_value=input_value, embedding_model=embedding_model)
-    retrieve_fn = lambda embedded_question, top_k: retrieve_with_cursor(cursor=cursor, ingestion_run=ingestion_run, embedded_question=embedded_question, top_k=top_k)
+    embed_fn = lambda input_value: embed_text(input_value=input_value, embedding_model=ingestion_run.embedding_config["embedding_model"])[0]
+    retrieve_fn = lambda embedded_question, top_k: retrieve_with_cursor(cursor=cursor, ingestion_run=ingestion_run,
+                                                                        embedded_question=embedded_question, top_k=top_k)
 
     evaluations = []
     with get_connection() as conn:
         with conn.cursor() as cursor:
             evaluations = evaluate_cases(
-                ingestion_run=ingestion_run,
                 eval_dataset=eval_dataset,
                 embed_fn=embed_fn,
                 retrieve_fn=retrieve_fn,
