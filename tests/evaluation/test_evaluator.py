@@ -1,4 +1,7 @@
+from uuid import UUID
+
 from src.evaluation.evaluator import evaluate_cases
+from src.models.ingestion_run import IngestionRun
 from src.models.retrieved_chunk import RetrievedChunk
 
 
@@ -21,11 +24,23 @@ def test_evaluate_cases_with_retrieved_chunks():
         )
     ]
 
+    ingestion_run = IngestionRun(
+        id=UUID("0199c8cf-ccf2-40c1-934b-67f71d2ac907"),
+        chunking_strategy="fixed-size",
+        embedding_config={"embedding_model": "sentence-transformers/all-MiniLM-L6-v2"},
+        chunking_config={"chunk_size": 100}
+    )
+
+    def fake_embed_fn(input_value, embedding_model):
+        return [[1.0, 1.0, 1.0, 1.0, 1.0]]
+
     def fake_retrieve(question, top_k):
         return retrieved_chunks
 
     evaluations = evaluate_cases(
+        ingestion_run=ingestion_run,
         eval_dataset=eval_dataset,
+        embed_fn=fake_embed_fn,
         retrieve_fn=fake_retrieve,
         top_k=top_k
     )

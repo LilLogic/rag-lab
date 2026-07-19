@@ -374,7 +374,7 @@ Retrieval without metadata filtering:
 from src.retrieval.retriever import retrieve
 
 results = retrieve(
-    question="Explain cache invalidation.",
+    embedded_question="Explain cache invalidation.",
     top_k=5,
 )
 

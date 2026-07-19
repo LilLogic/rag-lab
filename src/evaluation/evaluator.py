@@ -2,6 +2,7 @@ import json
 import logging
 from dataclasses import asdict
 
+from src.client.embedding_client import embed_text
 from src.client.postgres_client import get_connection
 from src.config.paths import ROOT_DIR
 from src.evaluation.metrics import reciprocal_rank, precision_at_top_k, recall_at_top_k, hit_at_k
@@ -35,13 +36,18 @@ def evaluate_case(case: dict, retrieved_chunks: list[RetrievedChunk], top_k: int
     }
 
 
-def evaluate_cases(eval_dataset: list[dict], retrieve_fn, top_k) -> list[dict]:
+def evaluate_cases(ingestion_run: IngestionRun, eval_dataset: list[dict], embed_fn, retrieve_fn, top_k: int) -> list[dict]:
     evaluations = []
 
     for i, case in enumerate(eval_dataset):
         logger.info(f"Evaluating case {i + 1}/{len(eval_dataset)}: {case['question']}")
 
-        retrieved_chunks = retrieve_fn(case["question"], top_k)
+        embedded_question = embed_fn(
+            input_value=case["question"],
+            embedding_model=ingestion_run.embedding_config["embedding_model"]
+        )[0]
+
+        retrieved_chunks = retrieve_fn(embedded_question, top_k)
         evaluations.append(
             evaluate_case(
                 case=case,
@@ -74,12 +80,17 @@ def evaluate(ingestion_run: IngestionRun, top_k: int):
     }
     save_json(path=run_dir / "config.json", data=config)
 
+    embed_fn = lambda input_value, embedding_model: embed_text(input_value=input_value, embedding_model=embedding_model)
+    retrieve_fn = lambda embedded_question, top_k: retrieve_with_cursor(cursor=cursor, ingestion_run=ingestion_run, embedded_question=embedded_question, top_k=top_k)
+
     evaluations = []
     with get_connection() as conn:
         with conn.cursor() as cursor:
             evaluations = evaluate_cases(
+                ingestion_run=ingestion_run,
                 eval_dataset=eval_dataset,
-                retrieve_fn=lambda question, top_k: retrieve_with_cursor(cursor=cursor, ingestion_run=ingestion_run, question=question, top_k=top_k),
+                embed_fn=embed_fn,
+                retrieve_fn=retrieve_fn,
                 top_k=top_k
             )
 
