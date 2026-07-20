@@ -7,11 +7,6 @@ from src.retrieval.retriever import retrieve_with_cursor
 from tests.integration.conftest import db_cursor
 
 
-def test_database_fixture(db_cursor):
-    db_cursor.execute("SELECT 1")
-    assert db_cursor.fetchone()[0] == 1
-
-
 def test_retrieval_isolated_by_ingestion_run(db_cursor):
     ingestion_run_a = IngestionRun(
         id=uuid.uuid4(),
