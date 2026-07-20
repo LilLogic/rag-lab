@@ -2,18 +2,17 @@
 
 A local Retrieval-Augmented Generation system built from scratch with Python, Ollama, PostgreSQL, and pgvector.
 
-The project implements the main stages of a RAG pipeline:
+The project is designed to make the main RAG engineering concerns explicit and testable:
 
-* text document ingestion;
-* fixed-size overlapping chunking;
-* LLM-based metadata extraction;
-* local embedding generation;
-* vector storage in PostgreSQL;
-* semantic retrieval with optional metadata filtering;
+* document ingestion and chunking;
+* metadata extraction;
+* embedding generation;
+* versioned corpora;
+* semantic retrieval;
 * retrieval evaluation;
-* context-grounded answer generation with a local LLM.
+* context-grounded answer generation.
 
-The repository is an engineering lab and portfolio project for exploring RAG architecture, retrieval quality, evaluation methodologies, and production-oriented Python structure without hiding the implementation behind a high-level RAG framework.
+High-level RAG frameworks are intentionally avoided so that data flows, interfaces, SQL queries, failure modes, and architectural decisions remain visible.
 
 ## Architecture
 
@@ -21,89 +20,78 @@ The repository is an engineering lab and portfolio project for exploring RAG arc
 Text documents
       |
       v
-LLM metadata extraction
+Metadata extraction
       |
       v
 Fixed-size overlapping chunking
       |
       v
-Embedding generation with Ollama
+Embedding generation
+      |
+      v
+Versioned ingestion run
       |
       v
 PostgreSQL + pgvector
       |
       v
-Vector similarity search
+Vector retrieval
       |
       +---- optional tag filtering
       |
       v
-Retrieved document chunks
+Retrieved chunks
       |
       v
-Prompt construction
-      |
-      v
-Local LLM response
+Local LLM answer generation
 ```
 
 ## Current capabilities
 
-### Document ingestion
+### Versioned ingestion
 
 The ingestion pipeline:
 
 1. reads `.txt` files from `data/raw_docs`;
-2. extracts document-level tags with the configured LLM;
-3. splits each document into overlapping chunks;
-4. generates an embedding for every chunk;
-5. stores the chunks and their metadata in PostgreSQL.
+2. extracts document-level tags;
+3. splits documents into overlapping chunks;
+4. generates an embedding for each chunk;
+5. creates a new ingestion run;
+6. stores the chunks and embeddings under that run.
 
-The stored metadata includes:
+Previous ingestion runs are preserved. This allows several indexed versions of the corpus to coexist in the same database.
 
-* source filename;
-* extracted tags;
-* chunk index;
-* embedding model;
-* chunk size;
-* chunk overlap;
-* creation timestamp.
+Each ingestion run records:
 
-Running ingestion truncates the existing `document_chunks` table before rebuilding the corpus.
+* its UUID;
+* its creation timestamp;
+* the chunking strategy and configuration;
+* the embedding model and vector dimension.
+
+Retrieval, evaluation, and answer generation operate on one explicitly selected ingestion run.
 
 ### Semantic retrieval
 
-Questions are embedded through Ollama and compared with stored vectors using pgvector cosine distance.
+Questions are embedded using the model configured for the selected ingestion run.
 
 Retrieval supports:
 
-* configurable top-K retrieval;
-* optional filtering by document tags;
-* reusable database cursors for batch evaluation;
-* structured `RetrievedChunk` results.
-
-When tags are supplied, PostgreSQL array-overlap filtering is applied before vector ranking.
-
-### Answer generation
-
-The answer pipeline:
-
-1. retrieves the five most relevant chunks;
-2. combines their content into a prompt;
-3. instructs the LLM to answer using only the provided sources;
-4. returns the generated response.
-
-The current implementation returns the answer as plain text. It does not yet expose source citations in the generated response.
+* vector similarity search using pgvector;
+* strict isolation by ingestion-run UUID;
+* configurable top-K;
+* optional tag filtering;
+* precomputed query embeddings;
+* structured retrieved-chunk results.
 
 ### Retrieval evaluation
 
-The evaluation framework reads questions and expected source documents from:
+The evaluation dataset is stored in:
 
 ```text
 data/evaluation/eval_dataset.json
 ```
 
-It calculates:
+The current metrics are:
 
 * Hit@1;
 * Hit@3;
@@ -118,7 +106,7 @@ Each evaluation execution creates a timestamped directory under:
 reports/evaluation/
 ```
 
-Each run contains:
+with:
 
 ```text
 config.json
@@ -126,7 +114,18 @@ summary.json
 details.json
 ```
 
-This records the retrieval configuration, aggregate metrics, retrieved sources, chunk contents, and per-question results.
+The report configuration includes the exact ingestion-run UUID used for the evaluation.
+
+### Answer generation
+
+The answer pipeline:
+
+1. embeds the user question;
+2. retrieves relevant chunks from the selected ingestion run;
+3. builds a prompt containing the original question and retrieved context;
+4. generates a response with the configured local LLM.
+
+Generated answers currently return plain text without structured citations.
 
 ## Technology stack
 
@@ -136,106 +135,81 @@ This records the retrieval configuration, aggregate metrics, retrieved sources, 
 * Docker Compose
 * Ollama
 * Psycopg 3
-* Requests
-* python-dotenv
 * pytest
-* pytest-cov
 
-Default local models:
-
-```text
-Embedding model: nomic-embed-text
-Generation model: qwen2.5:14b
-```
-
-The current database schema expects 768-dimensional embedding vectors.
-
-## Project structure
+Default models:
 
 ```text
-rag-lab/
-├── data/
-│   ├── evaluation/
-│   │   └── eval_dataset.json
-│   └── raw_docs/
-│       └── *.txt
-├── reports/
-│   └── evaluation/
-├── scripts/
-│   ├── init/
-│   │   ├── ingest_docs.py
-│   │   └── init_db.sql
-│   ├── answer_question.py
-│   ├── ask_llm.py
-│   ├── evaluate.py
-│   └── retrieve.py
-├── src/
-│   ├── chunking/
-│   │   └── chunker.py
-│   ├── client/
-│   │   ├── embedding_client.py
-│   │   ├── llm_client.py
-│   │   └── postgres_client.py
-│   ├── config/
-│   │   ├── logging_config.py
-│   │   ├── paths.py
-│   │   └── settings.py
-│   ├── evaluation/
-│   │   ├── evaluator.py
-│   │   ├── metrics.py
-│   │   └── report_writer.py
-│   ├── ingestion/
-│   │   └── ingester.py
-│   ├── llm/
-│   │   └── tag_extractor.py
-│   ├── models/
-│   │   ├── document_chunk.py
-│   │   └── retrieved_chunk.py
-│   ├── pipeline/
-│   │   └── pipeline.py
-│   └── retrieval/
-│       └── retriever.py
-├── tests/
-│   ├── chunking/
-│   ├── evaluation/
-│   ├── llm/
-│   └── models/
-├── .env.example
-├── .python_version
-├── docker-compose.yml
-├── requirements.txt
-└── README.md
+Embedding: nomic-embed-text
+Generation: qwen2.5:14b
 ```
+
+The current embedding storage uses 768-dimensional vectors.
+
+## Database model
+
+The schema is defined in:
+
+```text
+scripts/init/init_db.sql
+```
+
+Main tables:
+
+```text
+ingestion_runs
+    id UUID
+    created_at
+    chunking_strategy
+    chunking_config JSONB
+    embedding_config JSONB
+
+document_chunks
+    id
+    created_at
+    ingestion_run_id
+    source
+    content
+    chunk_index
+    tags
+    metadata
+
+chunk_embeddings_768
+    document_chunk_id
+    embedding vector(768)
+```
+
+Each chunk belongs to exactly one ingestion run.
+
+Embeddings are stored separately from chunk content and linked through a foreign key. An HNSW cosine-distance index supports vector retrieval.
 
 ## Requirements
 
-Install the following tools:
+Install:
 
 * Python 3.12;
 * Docker with Docker Compose;
 * Ollama.
 
-Pull the required Ollama models:
+Pull the required models:
 
 ```bash
 ollama pull nomic-embed-text
 ollama pull qwen2.5:14b
 ```
 
-Ollama must be running when performing ingestion, retrieval, metadata extraction, evaluation, or answer generation.
+Ollama must be running for ingestion, retrieval, evaluation, metadata extraction, and answer generation.
 
 ## Setup
 
-### 1. Clone the repository
+Clone the repository:
 
 ```bash
 git clone https://github.com/LilLogic/rag-lab.git
 cd rag-lab
 ```
 
-Run commands from the repository root so Python can resolve the `src` package.
-
-### 2. Create a virtual environment
+Create a virtual environment:
 
 ```bash
 python -m venv .venv
@@ -247,28 +221,19 @@ Activate it on Windows PowerShell:
 .venv\Scripts\Activate.ps1
 ```
 
-Activate it on Windows Command Prompt:
-
-```cmd
-.venv\Scripts\activate.bat
-```
-
 Activate it on Linux or macOS:
 
 ```bash
 source .venv/bin/activate
 ```
 
-### 3. Install dependencies
+Install dependencies:
 
 ```bash
-python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-### 4. Configure environment variables
-
-Create `.env` from the supplied example.
+Create the local environment file.
 
 Windows PowerShell:
 
@@ -282,175 +247,89 @@ Linux or macOS:
 cp .env.example .env
 ```
 
-Default configuration:
-
-```dotenv
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_DB=rag_lab
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
-
-OLLAMA_URL=http://localhost:11434
-EMBEDDING_MODEL=nomic-embed-text
-LLM_MODEL=qwen2.5:14b
-
-CHUNK_SIZE=400
-CHUNK_OVERLAP=80
-```
-
-### 5. Start PostgreSQL
+Start PostgreSQL:
 
 ```bash
 docker compose up -d
 ```
 
-Check the container status:
+Run commands from the repository root so Python can resolve the `src` package.
 
-```bash
-docker compose ps
+## Environment configuration
+
+The main environment variables are:
+
+```dotenv
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=rag_lab
+DB_USER=postgres
+DB_PASSWORD=postgres
+
+OLLAMA_URL=http://localhost:11434
+EMBEDDING_MODEL=nomic-embed-text
+LLM_MODEL=qwen2.5:14b
+
+DEFAULT_INGESTION_RUN_ID=
 ```
 
-Docker Compose starts PostgreSQL with pgvector, initializes the schema from `scripts/init/init_db.sql`, configures a health check, and creates a persistent volume.
+`DEFAULT_INGESTION_RUN_ID` is initially empty because no ingestion run exists yet.
 
-### 6. Ingest documents
+Ingestion does not require this value. Retrieval, evaluation, and answer generation do.
 
-Place `.txt` files under:
+## Ingest documents
+
+Place `.txt` files in:
 
 ```text
 data/raw_docs/
 ```
 
-Run ingestion:
+Run:
 
 ```bash
 python scripts/init/ingest_docs.py
 ```
 
-Ingestion extracts tags with the configured LLM and generates an embedding for each chunk, so Ollama must be available.
+The script creates a new ingestion run and outputs its UUID.
+
+Copy that UUID into `.env`:
+
+```dotenv
+DEFAULT_INGESTION_RUN_ID=<generated-uuid>
+```
+
+This value selects the default corpus used by the retrieval-related scripts.
+
+Running ingestion again creates another ingestion run without deleting previous runs.
 
 ## Usage
 
-### Generate an answer
-
-```bash
-python scripts/answer_question.py
-```
-
-The example question is currently defined directly in the script:
-
-```python
-question = "What is RAG?"
-```
-
-The application pipeline can also be called from Python:
-
-```python
-from src.pipeline.pipeline import answer_question
-
-response = answer_question("What is RAG?")
-print(response)
-```
-
-### Run semantic retrieval
+Run semantic retrieval:
 
 ```bash
 python scripts/retrieve.py
 ```
 
-The example script performs retrieval with both a question and tag filters:
-
-```python
-results = retrieve(
-    question="Explain cache invalidation.",
-    top_k=5,
-    tags=["caching", "expiration"],
-)
-```
-
-Retrieval without metadata filtering:
-
-```python
-from src.retrieval.retriever import retrieve
-
-results = retrieve(
-    embedded_question="Explain cache invalidation.",
-    top_k=5,
-)
-
-for chunk in results:
-    print(chunk.source)
-    print(chunk.distance)
-    print(chunk.content)
-```
-
-Retrieval with metadata filtering:
-
-```python
-results = retrieve(
-    question="Explain cache invalidation.",
-    top_k=5,
-    tags=["caching", "expiration"],
-)
-```
-
-A chunk is eligible when at least one of its stored tags overlaps with the supplied tag list.
-
-### Test the LLM client
-
-```bash
-python scripts/scratch_llm.py
-```
-
-This is a development utility for experimenting directly with the configured generation model.
-
-### Run retrieval evaluation
+Run retrieval evaluation:
 
 ```bash
 python scripts/evaluate.py
 ```
 
-The evaluator:
+Generate a context-grounded answer:
 
-1. loads the evaluation dataset;
-2. retrieves the top-K chunks for each question;
-3. compares retrieved sources with expected sources;
-4. calculates aggregate retrieval metrics;
-5. prints per-question and aggregate results;
-6. writes a timestamped evaluation report.
-
-An evaluation case follows this structure:
-
-```json
-{
-  "question": "What is cache invalidation?",
-  "expected_sources": [
-    "cache_invalidation.txt"
-  ]
-}
+```bash
+python scripts/answer_question.py
 ```
 
-## Evaluation metrics
+These scripts use the run selected by `DEFAULT_INGESTION_RUN_ID`.
 
-### Hit@K
+When the variable is absent, they fail early with an explicit configuration error.
 
-Returns whether at least one expected source appears in the first K retrieved results.
+Questions, top-K values, and optional tag filters are currently configured directly in the scripts.
 
-### Mean Reciprocal Rank
-
-Measures how highly the first relevant source is ranked. Earlier relevant results receive a higher score.
-
-### Precision@K
-
-Measures the proportion of the first K retrieved results whose source belongs to the expected source set.
-
-### Recall@K
-
-Measures the proportion of expected sources found within the first K retrieved results.
-
-The current framework evaluates retrieval at the source-document level. It does not yet evaluate answer correctness, answer relevance, faithfulness, or citation accuracy.
-
-## Running tests
+## Testing
 
 Run the complete test suite:
 
@@ -458,40 +337,26 @@ Run the complete test suite:
 pytest
 ```
 
-Run the suite with coverage:
+Run tests with coverage:
 
 ```bash
 pytest --cov=src
 ```
 
-The tests are organized by component under the root-level `tests` directory.
+The suite contains:
 
-## Database
+* unit tests for isolated application logic;
+* integration tests using PostgreSQL and pgvector.
 
-The PostgreSQL schema is defined in:
+The retrieval integration test creates two temporary ingestion runs and verifies that retrieval cannot return a chunk belonging to another run, even when that chunk is the globally closest vector match.
 
-```text
-scripts/init/init_db.sql
-```
+Integration tests require the PostgreSQL container to be running.
 
-The `document_chunks` table contains:
+Test database inserts execute inside a transaction and are rolled back after each test.
 
-* an identity primary key;
-* source filename;
-* chunk content;
-* a 768-dimensional vector embedding;
-* document tags;
-* chunk index;
-* embedding model;
-* chunk size;
-* chunk overlap;
-* creation timestamp.
+## Reset the database
 
-An HNSW index using cosine-distance vector operations is created on the embedding column.
-
-### Reset the database
-
-Stop PostgreSQL and delete its persistent volume:
+Stop the containers and delete the PostgreSQL volume:
 
 ```bash
 docker compose down -v
@@ -503,85 +368,78 @@ Recreate the database:
 docker compose up -d
 ```
 
-Rebuild the corpus:
+Run ingestion again:
 
 ```bash
 python scripts/init/ingest_docs.py
 ```
 
-Deleting the volume permanently removes the locally stored database contents.
+Update `DEFAULT_INGESTION_RUN_ID` with the newly generated UUID.
 
-## Configuration
-
-Environment settings are loaded from `.env` and centralized in:
+## Project structure
 
 ```text
-src/config/settings.py
+rag-lab/
+├── data/
+│   ├── evaluation/
+│   └── raw_docs/
+├── reports/
+│   └── evaluation/
+├── scripts/
+│   ├── init/
+│   │   ├── ingest_docs.py
+│   │   └── init_db.sql
+│   ├── answer_question.py
+│   ├── evaluate.py
+│   └── retrieve.py
+├── src/
+│   ├── client/
+│   ├── config/
+│   ├── evaluation/
+│   ├── ingestion/
+│   ├── llm/
+│   ├── models/
+│   ├── pipeline/
+│   ├── retrieval/
+│   └── utils/
+├── tests/
+│   ├── integration/
+│   └── unit test directories
+├── docker-compose.yml
+├── requirements.txt
+└── README.md
 ```
-
-Repository-relative paths are centralized in:
-
-```text
-src/config/paths.py
-```
-
-Executable scripts initialize application logging through:
-
-```text
-src/config/logging_config.py
-```
-
-Library modules use named loggers without configuring global logging themselves.
 
 ## Current limitations
 
-* Only plain-text documents are ingested.
-* Chunking uses character counts rather than tokens or semantic boundaries.
-* Tags are extracted once per document and applied to all of its chunks.
-* Retrieval uses dense vector similarity only.
-* Query tags must currently be supplied explicitly.
-* There is no keyword-search or hybrid-search stage.
-* There is no reranking stage.
-* Retrieved chunks are concatenated directly into the generation prompt.
-* Generated answers do not currently include structured source citations.
-* Evaluation is limited to source-level retrieval quality.
-* The embedding dimension is fixed at 768 in the database schema.
-* The project has no API or graphical interface.
+* Only plain-text documents are supported.
+* Chunking is fixed-size and character-based.
+* Tags are extracted once per document.
+* Retrieval uses dense vectors only.
+* Hybrid retrieval and reranking are not implemented.
+* Generated answers do not include structured source citations.
+* Evaluation currently focuses on retrieval rather than answer quality or faithfulness.
+* The embedding storage dimension is fixed at 768.
+* Ingestion runs are selected manually by UUID.
+* There is no API or graphical interface.
 
-## Potential next steps
+## Planned exploration
 
-* hybrid vector and keyword retrieval;
-* candidate reranking;
-* automatic query-tag extraction;
-* retrieval filtering experiments;
+Potential next steps include:
+
 * alternative chunking strategies;
-* configurable prompt templates;
-* source citations in generated answers;
-* answer relevance and faithfulness evaluation;
-* support for additional embedding models;
-* integration testing for database-backed components;
-* continuous integration;
-* API and interactive interfaces;
-* deployment and observability.
-
-## Project objectives
-
-RAG Lab is designed to make each stage of a RAG system explicit and independently testable:
-
-* document preparation;
-* metadata extraction;
-* chunking;
-* embedding generation;
-* vector persistence;
-* retrieval;
-* retrieval evaluation;
-* prompt construction;
-* answer generation.
-
-The project favors direct implementation over framework abstraction so that architectural choices and their impact on retrieval quality remain visible.
+* comparison of multiple ingestion runs;
+* hybrid lexical and vector retrieval;
+* reranking;
+* metadata-filtering experiments;
+* structured source citations;
+* answer-faithfulness evaluation;
+* support for multiple embedding dimensions;
+* human-readable corpus names and run selection;
+* observability, CI, API, and deployment.
 
 ## License
 
-No open-source license is currently included in the repository.
+No open-source license is currently included.
 
-Public visibility alone does not grant permission to reuse, modify, or redistribute the source code.
+Public visibility does not grant permission to reuse, modify, or redistribute the source code.
