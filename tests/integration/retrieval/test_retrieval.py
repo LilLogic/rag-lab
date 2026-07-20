@@ -4,7 +4,6 @@ from src.ingestion.ingester import insert_document_chunk, insert_ingestion_run, 
 from src.models.document_chunk import DocumentChunk
 from src.models.ingestion_run import IngestionRun
 from src.retrieval.retriever import retrieve_with_cursor
-from tests.integration.conftest import db_cursor
 
 
 def test_retrieval_isolated_by_ingestion_run(db_cursor):
