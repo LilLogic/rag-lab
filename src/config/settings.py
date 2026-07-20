@@ -20,4 +20,18 @@ CHUNK_SIZE = int(os.getenv("CHUNK_SIZE"))
 CHUNK_OVERLAP = int(os.getenv("CHUNK_OVERLAP"))
 DEFAULT_TOP_K = int(os.getenv("DEFAULT_TOP_K"))
 
-DEFAULT_INGESTION_RUN_ID = UUID(os.getenv("DEFAULT_INGESTION_RUN_ID"))
+_raw_ingestion_run_id = os.getenv("DEFAULT_INGESTION_RUN_ID")
+
+DEFAULT_INGESTION_RUN_ID: UUID | None = (
+    UUID(_raw_ingestion_run_id) if _raw_ingestion_run_id else None
+)
+
+
+def require_default_ingestion_run_id():
+    if DEFAULT_INGESTION_RUN_ID is None:
+        raise RuntimeError(
+            "DEFAULT_INGESTION_RUN_ID is not configured. "
+            "Run ingestion, copy the generated UUID, and add it to .env."
+        )
+
+    return DEFAULT_INGESTION_RUN_ID
